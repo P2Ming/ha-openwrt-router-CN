@@ -1,8 +1,8 @@
 # OpenWrt Router – Home Assistant Integration
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![Version](https://img.shields.io/github/v/release/magicx78/ha-openwrt-router?label=version&color=blue)](https://github.com/magicx78/ha-openwrt-router/releases/latest)
-[![Tests](https://img.shields.io/github/actions/workflow/status/magicx78/ha-openwrt-router/tests.yaml?branch=main&label=tests)](https://github.com/magicx78/ha-openwrt-router/actions/workflows/tests.yaml)
+[![Version](https://img.shields.io/github/v/release/P2Ming/ha-openwrt-router-CN?label=version&color=blue)](https://github.com/P2Ming/ha-openwrt-router-CN/releases/latest)
+[![Tests](https://img.shields.io/github/actions/workflow/status/P2Ming/ha-openwrt-router-CN/tests.yaml?branch=main&label=tests)](https://github.com/P2Ming/ha-openwrt-router-CN/actions/workflows/tests.yaml)
 
 A production-ready Home Assistant custom integration for [OpenWrt](https://openwrt.org/) routers, communicating via the built-in **ubus / rpcd JSON-RPC API**. Supports multi-AP mesh networks with a live topology panel.
 
@@ -10,11 +10,11 @@ A production-ready Home Assistant custom integration for [OpenWrt](https://openw
 
 ## Installation
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=magicx78&repository=ha-openwrt-router&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=P2Ming&repository=ha-openwrt-router-CN&category=integration)
 
 **Via HACS (Recommended)**
 1. Click the button above — or open HACS → Integrations → ⋮ → Custom repositories
-2. Add `https://github.com/magicx78/ha-openwrt-router` as **Integration**
+2. Add `https://github.com/P2Ming/ha-openwrt-router-CN` as **Integration**
 3. Search for and install **OpenWrt Router**
 4. Restart Home Assistant
 

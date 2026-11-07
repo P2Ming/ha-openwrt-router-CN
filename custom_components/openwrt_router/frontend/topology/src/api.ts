@@ -916,6 +916,10 @@ export function adaptSnapshot(snap: Snapshot): TopologyData {
     clients,
     switchNodes,
     timestamp: snap.generated_at,
+    pollIntervalSeconds:
+      typeof snap.meta?.poll_interval_seconds === 'number'
+        ? snap.meta.poll_interval_seconds
+        : undefined,
   };
 }
 

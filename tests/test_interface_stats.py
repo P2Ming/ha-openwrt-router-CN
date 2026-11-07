@@ -149,6 +149,47 @@ class TestInterfaceCounters:
         )
         assert api.get_port_stats.await_args.kwargs["device_status"] is DEVICE_STATUS
 
+    @pytest.mark.asyncio
+    async def test_wan_named_counter_read_fills_eth0_rate_sensors(self):
+        """A working WAN rate must also feed its matching interface sensors."""
+        coord, api = _make_coordinator()
+        api.get_wan_status = AsyncMock(
+            side_effect=[
+                {
+                    "connected": True,
+                    "interface": "wan",
+                    "device": "eth0",
+                    "rx_bytes": 1000,
+                    "tx_bytes": 500,
+                },
+                {
+                    "connected": True,
+                    "interface": "wan",
+                    "device": "eth0",
+                    "rx_bytes": 1600,
+                    "tx_bytes": 800,
+                },
+            ]
+        )
+        api.get_network_interfaces = AsyncMock(
+            return_value=[
+                {
+                    "interface": "eth0",
+                    "status": "up",
+                    "rx_bytes": None,
+                    "tx_bytes": None,
+                }
+            ]
+        )
+
+        first = await coord._async_update_data()
+        assert _iface(first, "eth0")["rx_rate"] is None
+
+        coord._prev_poll_time = datetime.now(UTC) - timedelta(seconds=10)
+        second = await coord._async_update_data()
+        assert _iface(second, "eth0")["rx_rate"] == pytest.approx(60.0, abs=1.0)
+        assert _iface(second, "eth0")["tx_rate"] == pytest.approx(30.0, abs=1.0)
+
 
 # ---------------------------------------------------------------------------
 # NEU-B6 — rates are None without a valid previous sample

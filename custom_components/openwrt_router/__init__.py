@@ -43,7 +43,15 @@ from .api import (
     OpenWrtResponseError,
     OpenWrtTimeoutError,
 )
-from .const import CONF_PROTOCOL, DEFAULT_PROTOCOL, DOMAIN, PROTOCOL_HTTP
+from .const import (
+    CONF_POLL_INTERVAL,
+    CONF_PROTOCOL,
+    DEFAULT_POLL_INTERVAL_SECONDS,
+    DEFAULT_PROTOCOL,
+    DOMAIN,
+    PROTOCOL_HTTP,
+    normalise_poll_interval,
+)
 from .coordinator import OpenWrtCoordinator
 from .fleet import (
     async_get_channel_plan_monitor,
@@ -341,8 +349,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: OpenWrtConfigEntry) -> b
 
     # Stagger polling: spread multiple coordinators evenly across the scan interval
     # so they never all poll simultaneously (e.g. 4 routers × 15s = 0/15/30/45s offsets).
-    from .const import SCAN_INTERVAL_SECONDS
-
+    poll_interval = normalise_poll_interval(
+        entry.options.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL_SECONDS)
+    )
     poll_offset = _stagger_offset(
         [
             e.entry_id
@@ -350,7 +359,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: OpenWrtConfigEntry) -> b
             if e.disabled_by is None and e.source != SOURCE_IGNORE
         ],
         entry.entry_id,
-        SCAN_INTERVAL_SECONDS,
+        poll_interval,
     )
 
     # Create and populate the coordinator

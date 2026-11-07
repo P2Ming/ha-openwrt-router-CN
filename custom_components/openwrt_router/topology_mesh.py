@@ -1550,6 +1550,7 @@ def build_mesh_snapshot(hass: HomeAssistant) -> dict[str, Any]:
     all_interfaces: list[dict[str, Any]] = []
     all_clients: list[dict[str, Any]] = []
     router_data: list[tuple[str, str, OpenWrtCoordinatorData]] = []
+    poll_intervals: list[int] = []
 
     # Fleet-wide identity, collected before the per-router snapshots are built:
     # only the gateway runs a DHCP server, so a dumb AP has no way to put a name
@@ -1580,6 +1581,7 @@ def build_mesh_snapshot(hass: HomeAssistant) -> dict[str, Any]:
             continue
         host_ip = str(entry.data.get("host", ""))
         data = coordinator.data
+        poll_intervals.append(int(getattr(coordinator, "poll_interval_seconds", 60)))
         loaded.append(
             (
                 entry,
@@ -1835,6 +1837,7 @@ def build_mesh_snapshot(hass: HomeAssistant) -> dict[str, Any]:
             "client_count": client_count,
             "router_count": router_count,
             "mesh": True,
+            "poll_interval_seconds": min(poll_intervals, default=60),
         },
     }
 

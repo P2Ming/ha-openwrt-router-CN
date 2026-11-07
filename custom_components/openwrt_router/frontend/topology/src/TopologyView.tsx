@@ -530,7 +530,9 @@ export function TopologyView({ data }: Props) {
             onSelectClient={selectClient}
           />
         )}
-        {activeTab === 'settings' && <SettingsView />}
+        {activeTab === 'settings' && (
+          <SettingsView pollIntervalSeconds={data.pollIntervalSeconds} />
+        )}
         {activeTab === 'compare' && <CompareView data={data} />}
 
         {/* ── Topology zoom/pan canvas ─────────────────────────── */}

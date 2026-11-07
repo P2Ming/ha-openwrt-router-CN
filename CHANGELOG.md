@@ -4,6 +4,22 @@ All notable changes to the OpenWrt Router integration will be documented in this
 
 ## [Unreleased]
 
+## [1.39.2] - 2026-11-07
+
+### Fixed
+
+- 修复部分 OpenWrt 固件中 `eth0 RX Rate` / `eth0 TX Rate` 长期显示未知的问题：
+  当批量 `network.device status {}` 不提供计数器时，复用同一次轮询中已成功读取的
+  WAN 设备计数器，不增加额外路由器请求。
+
+### Added
+
+- 集成选项新增“网口速率轮询间隔（秒）”，可设置为 5–300 秒，并立即生效。
+- Network Topology 页面跟随所配置的后端轮询间隔刷新，并显示当前设置。
+- 仓库、HACS、文档和问题链接更新为 `P2Ming/ha-openwrt-router-CN`。
+
+## [1.39.1] - 2026-11-07
+
 ### Changed
 
 - **Topologie-Panel zeigt veraltete Daten an.** Clients und Verbindungen eines

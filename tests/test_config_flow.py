@@ -401,6 +401,7 @@ class TestNoSwitchOrFritzboxSteps:
         assert result["type"] == "form"
         keys = {str(k) for k in result["data_schema"].schema}
         assert keys == {
+            "poll_interval",
             "extended_wifi_sensors",
             "topology_port_debug",
             "topology_panel_all_users",

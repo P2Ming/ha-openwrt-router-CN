@@ -28,6 +28,7 @@ from custom_components.openwrt_router.coordinator import (
     OpenWrtCoordinatorData,
 )
 from custom_components.openwrt_router.const import (
+    CONF_POLL_INTERVAL,
     NOTIFICATION_FAILURE_THRESHOLD,
     SCAN_INTERVAL_SECONDS,
     SSH_FALLBACK_INTERVAL_SECONDS,
@@ -135,6 +136,23 @@ def _coord_with(cpu: float, ssh: bool):
 
 
 class TestIntervalFromState:
+    def test_configured_interval_applies_immediately(self):
+        _, api = _make_coordinator()
+        api.uses_ssh_fallback = False
+        entry = MagicMock()
+        entry.options = {CONF_POLL_INTERVAL: 15}
+        with patch("homeassistant.helpers.frame.report_usage"):
+            coord = OpenWrtCoordinator(
+                hass=MagicMock(), api=api, entry_title="test", entry=entry
+            )
+
+        assert coord.poll_interval_seconds == 15
+        assert coord.update_interval == timedelta(seconds=15)
+
+        coord.set_poll_interval(8)
+        assert coord.poll_interval_seconds == 8
+        assert coord.update_interval == timedelta(seconds=8)
+
     @pytest.mark.asyncio
     async def test_ssh_fallback_then_repaired_acl_restores_default(self):
         coord, api = _coord_with(cpu=10.0, ssh=True)

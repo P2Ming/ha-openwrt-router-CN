@@ -26,7 +26,7 @@ kein SSH nötig) — Details und manuelle Alternative im [README](README.md).
 Die Integration ist (noch) nicht im HACS Default Store — Installation als Custom Repository:
 
 1. HACS → rechts oben ⋮ → **Custom repositories**
-2. Repository: `https://github.com/magicx78/ha-openwrt-router` · Typ: **Integration** → Add
+2. Repository: `https://github.com/P2Ming/ha-openwrt-router-CN` · Typ: **Integration** → Add
 3. HACS → „OpenWrt Router" suchen → **Download**
 4. Home Assistant neu starten
 
@@ -34,7 +34,7 @@ Updates erscheinen danach automatisch in HACS, sobald ein neues Release getaggt 
 
 ## Manuelle Installation
 
-1. Aktuelles Release laden: https://github.com/magicx78/ha-openwrt-router/releases/latest
+1. Aktuelles Release laden: https://github.com/P2Ming/ha-openwrt-router-CN/releases/latest
 2. Ordner `custom_components/openwrt_router/` nach `<ha-config>/custom_components/` kopieren
 3. Home Assistant neu starten
 

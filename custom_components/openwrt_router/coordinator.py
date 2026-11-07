@@ -46,8 +46,10 @@ from .const import (
     CLIENT_KEY_CONNECTED_SINCE,
     CLIENT_KEY_LAST_SEEN,
     CLIENT_KEY_MAC,
+    CONF_POLL_INTERVAL,
     CPU_HISTORY_MAX_POINTS,
     CPU_HISTORY_WINDOW_SECONDS,
+    DEFAULT_POLL_INTERVAL_SECONDS,
     DEFAULT_SERVICES,
     DFS_EVIDENCE_SECONDS,
     DHCP_CONFIG_REFRESH_CYCLES,
@@ -109,13 +111,13 @@ from .const import (
     RAM_PRESSURE_HOLD_SECONDS,
     SCAN_INTERVAL_SECONDS,
     SSH_FALLBACK_INTERVAL_SECONDS,
-    THROTTLED_INTERVAL_SECONDS,
     TOPOLOGY_SNAPSHOT_INTERVAL_CYCLES,
     TOPOLOGY_SNAPSHOT_MAX,
     USTEER_RETRY_CYCLES,
     USTEER_STATUS_OK,
     USTEER_STATUS_PENDING,
     USTEER_STATUS_UNAVAILABLE,
+    normalise_poll_interval,
 )
 from .dhcp_health import Pool, parse_dhcp_config, pool_usage
 from .issues import (
@@ -395,7 +397,7 @@ class OpenWrtCoordinatorData:
 
 
 class OpenWrtCoordinator(DataUpdateCoordinator[OpenWrtCoordinatorData]):
-    """Coordinator that polls the OpenWrt router every SCAN_INTERVAL_SECONDS.
+    """Coordinator that polls the OpenWrt router at a configurable interval.
 
     Architecture notes:
     - A single coordinator instance per config entry is created in __init__.py.
@@ -422,15 +424,21 @@ class OpenWrtCoordinator(DataUpdateCoordinator[OpenWrtCoordinatorData]):
             entry: Config entry; forwarded to the base class — explicit passing
                 is required from HA 2026.8 (implicit ContextVar lookup is removed).
         """
+        poll_interval = normalise_poll_interval(
+            entry.options.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL_SECONDS)
+            if entry is not None
+            else DEFAULT_POLL_INTERVAL_SECONDS
+        )
         super().__init__(
             hass,
             _LOGGER,
             name=f"{DOMAIN}_{entry_title}",
-            update_interval=timedelta(seconds=SCAN_INTERVAL_SECONDS),
+            update_interval=timedelta(seconds=poll_interval),
             config_entry=entry,
         )
         self.api = api
         self._entry = entry
+        self._poll_interval_seconds = poll_interval
         self._features_detected = False
         self._board_poll_count = 0
         self._poll_offset_seconds = poll_offset_seconds
@@ -777,6 +785,7 @@ class OpenWrtCoordinator(DataUpdateCoordinator[OpenWrtCoordinatorData]):
                 data.network_interfaces = await self.api.get_network_interfaces(
                     device_status=device_status
                 )
+                self._apply_wan_counter_fallback(data)
                 if data.network_interfaces:
                     self._last_known_network_interfaces = data.network_interfaces
                 data.vlans_stale = False
@@ -1136,7 +1145,7 @@ class OpenWrtCoordinator(DataUpdateCoordinator[OpenWrtCoordinatorData]):
                     f"**Konfigurieren** — der Berechtigungs-Check kann die rpcd-ACL "
                     f"automatisch auf den Router schreiben (ubus bzw. SSH-Fallback).\n\n"
                     f"Alternativ manuell mit `scripts/ha-openwrt-router.json` aus dem "
-                    f"[Repository](https://github.com/magicx78/ha-openwrt-router):\n\n"
+                    f"[Repository](https://github.com/P2Ming/ha-openwrt-router-CN):\n\n"
                     f"```\nscp scripts/ha-openwrt-router.json root@{self.api._host}:"
                     f"/usr/share/rpcd/acl.d/ha-openwrt-router.json\n"
                     f"ssh root@{self.api._host} /etc/init.d/rpcd restart\n```\n\n"
@@ -1164,7 +1173,7 @@ class OpenWrtCoordinator(DataUpdateCoordinator[OpenWrtCoordinatorData]):
                 self.name,
                 cpu,
                 _cpu_load_basis(data),
-                THROTTLED_INTERVAL_SECONDS,
+                self._poll_interval_seconds * 2,
             )
         elif self._throttled and cpu < 80:
             self._throttled = False
@@ -1173,7 +1182,7 @@ class OpenWrtCoordinator(DataUpdateCoordinator[OpenWrtCoordinatorData]):
                 self.name,
                 cpu,
                 _cpu_load_basis(data),
-                SCAN_INTERVAL_SECONDS,
+                self._poll_interval_seconds,
             )
 
         # Derived from the current state on every poll, so a repaired ACL or
@@ -1189,10 +1198,50 @@ class OpenWrtCoordinator(DataUpdateCoordinator[OpenWrtCoordinatorData]):
         default scan interval applies.
         """
         if self.api.uses_ssh_fallback:
-            return timedelta(seconds=SSH_FALLBACK_INTERVAL_SECONDS)
+            return timedelta(
+                seconds=max(self._poll_interval_seconds, SSH_FALLBACK_INTERVAL_SECONDS)
+            )
         if self._throttled:
-            return timedelta(seconds=THROTTLED_INTERVAL_SECONDS)
-        return timedelta(seconds=SCAN_INTERVAL_SECONDS)
+            return timedelta(seconds=self._poll_interval_seconds * 2)
+        return timedelta(seconds=self._poll_interval_seconds)
+
+    @property
+    def poll_interval_seconds(self) -> int:
+        """Return the configured base polling interval in seconds."""
+        return self._poll_interval_seconds
+
+    def set_poll_interval(self, seconds: int) -> None:
+        """Apply a new base polling interval without reloading the entry."""
+        self._poll_interval_seconds = normalise_poll_interval(seconds)
+        self.update_interval = self._interval_for_state()
+
+    def _apply_wan_counter_fallback(self, data: OpenWrtCoordinatorData) -> None:
+        """Synchronise WAN interface counters with the WAN status read.
+
+        Some OpenWrt builds allow ``network.device status {"name": ...}``
+        but return no usable data for the unnamed bulk call. WAN throughput
+        therefore works while the matching per-interface rate sensors stay
+        unknown. The WAN status was already read successfully with the named
+        call, so reuse its counters without adding another router request.
+        """
+        wan_name = str(data.wan_status.get("interface") or "")
+        wan_device = str(data.wan_status.get("device") or "")
+        rx = _as_counter(data.wan_status.get("rx_bytes"))
+        tx = _as_counter(data.wan_status.get("tx_bytes"))
+        if not (wan_name or wan_device) or rx is None or tx is None:
+            return
+        for iface in data.network_interfaces:
+            names = {
+                str(iface.get("interface") or ""),
+                str(iface.get("logical_name") or ""),
+            }
+            if not ({wan_name, wan_device} & names):
+                continue
+            # The named WAN read is authoritative for this device and belongs
+            # to the same poll, so it is also safe to replace bulk counters.
+            iface["rx_bytes"] = rx
+            iface["tx_bytes"] = tx
+            break
 
     # ------------------------------------------------------------------
     # WAN throughput

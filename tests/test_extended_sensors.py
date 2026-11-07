@@ -10,6 +10,7 @@ from homeassistant.helpers import entity_registry as er
 from custom_components.openwrt_router.config_flow import OpenWrtOptionsFlow
 from custom_components.openwrt_router.const import (
     CONF_EXTENDED_WIFI_SENSORS,
+    CONF_POLL_INTERVAL,
     CONF_TOPOLOGY_PANEL_ALL_USERS,
     CONF_TOPOLOGY_PORT_DEBUG,
     OPT_EXTENDED_WIFI_PREEXISTING,
@@ -124,6 +125,7 @@ class TestOptionsFlow:
             result = await flow.async_step_init(user_input=None)
         keys = {str(k) for k in result["data_schema"].schema}
         assert keys == {
+            CONF_POLL_INTERVAL,
             CONF_EXTENDED_WIFI_SENSORS,
             CONF_TOPOLOGY_PORT_DEBUG,
             CONF_TOPOLOGY_PANEL_ALL_USERS,

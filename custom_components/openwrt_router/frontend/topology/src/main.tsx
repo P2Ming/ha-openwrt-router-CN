@@ -17,7 +17,8 @@ import { MOCK_DATA } from './mockData';
 
 // ── HA Webcomponent ──────────────────────────────────────────────────────
 
-const REFRESH_MS = 30_000;
+const DEFAULT_REFRESH_MS = 30_000;
+const MIN_REFRESH_MS = 5_000;
 const FONT = 'var(--paper-font-body1_-_font-family, sans-serif)';
 
 /** Why requests are paused / refused: 401 waits for a new token, 403 for rights. */
@@ -38,6 +39,7 @@ class OpenWrtTopologyPanel extends HTMLElement {
   private _root: Root | null = null;
   private _hass: HassLike | null = null;
   private _refreshTimer: ReturnType<typeof setInterval> | null = null;
+  private _refreshMs = DEFAULT_REFRESH_MS;
   private _retryTimer: ReturnType<typeof setTimeout> | null = null;
   private _fetching = false;
   // Last successfully loaded topology — kept on screen across transient errors.
@@ -120,7 +122,19 @@ class OpenWrtTopologyPanel extends HTMLElement {
 
   private _startPolling() {
     if (this._refreshTimer) return;
-    this._refreshTimer = setInterval(() => void this._fetchAndRender(), REFRESH_MS);
+    this._refreshTimer = setInterval(
+      () => void this._fetchAndRender(),
+      this._refreshMs,
+    );
+  }
+
+  private _setRefreshInterval(seconds: number | undefined) {
+    if (!Number.isFinite(seconds) || seconds == null) return;
+    const nextMs = Math.max(MIN_REFRESH_MS, Math.round(seconds * 1_000));
+    if (nextMs === this._refreshMs) return;
+    this._refreshMs = nextMs;
+    this._stopPolling();
+    this._startPolling();
   }
 
   private _stopPolling() {
@@ -137,6 +151,7 @@ class OpenWrtTopologyPanel extends HTMLElement {
       if (!this._root) return;
       this._authBlock = null;
       this._lastData = topologyData;
+      this._setRefreshInterval(topologyData.pollIntervalSeconds);
       this._renderTopology(topologyData, null);
       this._startPolling();
     } catch (err) {

@@ -1910,7 +1910,8 @@ class OpenWrtAPI:
         Returns:
             {
                 "connected": bool,
-                "interface": str,
+                "interface": str,  # logical name, e.g. "wan"
+                "device": str,     # kernel device, e.g. "eth0"
                 "ipv4": str,
                 "uptime": int,
                 "proto": str,
@@ -1978,6 +1979,7 @@ class OpenWrtAPI:
             status: dict[str, Any] = {
                 "connected": False,
                 "interface": "",
+                "device": "",
                 "ipv4": "",
                 "uptime": 0,
                 "proto": "",
@@ -2001,15 +2003,14 @@ class OpenWrtAPI:
         # would be compared with the last PPP sample (phantom peak).
         rx_bytes: int | None = None
         tx_bytes: int | None = None
+        wan_device = wan_iface.get("l3_device") or wan_iface.get("device") or iface_name
         if wan_iface.get("up"):
-            wan_device = (
-                wan_iface.get("l3_device") or wan_iface.get("device") or iface_name
-            )
             rx_bytes, tx_bytes = await self._read_wan_counters(str(wan_device))
 
         return {
             "connected": wan_iface.get("up", False),
             "interface": wan_iface.get("interface", ""),
+            "device": str(wan_device),
             "ipv4": ipv4,
             "uptime": wan_iface.get("uptime", 0),
             "proto": wan_iface.get("proto", ""),

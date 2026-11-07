@@ -29,10 +29,12 @@ from .api import (
 )
 from .const import (
     CONF_EXTENDED_WIFI_SENSORS,
+    CONF_POLL_INTERVAL,
     CONF_PROTOCOL,
     CONF_TOPOLOGY_PANEL_ALL_USERS,
     CONF_TOPOLOGY_PORT_DEBUG,
     DEFAULT_EXTENDED_WIFI_SENSORS,
+    DEFAULT_POLL_INTERVAL_SECONDS,
     DEFAULT_PORT,
     DEFAULT_PROTOCOL,
     DEFAULT_TOPOLOGY_PANEL_ALL_USERS,
@@ -48,10 +50,13 @@ from .const import (
     ERROR_RPCD_SETUP,
     ERROR_TIMEOUT,
     ERROR_UNKNOWN,
+    MAX_POLL_INTERVAL_SECONDS,
+    MIN_POLL_INTERVAL_SECONDS,
     OPT_EXTENDED_WIFI_PREEXISTING,
     PROTOCOL_HTTP,
     PROTOCOL_HTTPS,
     PROTOCOL_HTTPS_INSECURE,
+    normalise_poll_interval,
 )
 from .extended_sensors import async_apply_extended_wifi_sensors
 from .ssl_util import ssl_context_for_protocol
@@ -133,10 +138,32 @@ class OpenWrtOptionsFlow(OptionsFlow):
                     "Could not apply the topology panel access option",
                     exc_info=True,
                 )
+            # Apply the new interval immediately to a loaded entry. The value
+            # is also stored below, so the same interval is restored on restart.
+            runtime = getattr(self.config_entry, "runtime_data", None)
+            coordinator = getattr(runtime, "coordinator", None) if runtime else None
+            if coordinator is not None:
+                coordinator.set_poll_interval(
+                    normalise_poll_interval(
+                        new_opts.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL_SECONDS)
+                    )
+                )
             return self.async_create_entry(title="", data=new_opts)
 
         schema = vol.Schema(
             {
+                vol.Optional(
+                    CONF_POLL_INTERVAL,
+                    default=normalise_poll_interval(
+                        opts.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL_SECONDS)
+                    ),
+                ): vol.All(
+                    vol.Coerce(int),
+                    vol.Range(
+                        min=MIN_POLL_INTERVAL_SECONDS,
+                        max=MAX_POLL_INTERVAL_SECONDS,
+                    ),
+                ),
                 vol.Optional(
                     CONF_EXTENDED_WIFI_SENSORS,
                     default=opts.get(

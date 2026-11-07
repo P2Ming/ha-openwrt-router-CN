@@ -4,11 +4,13 @@
       "init": {
         "title": "路由器选项",
         "data": {
+          "poll_interval": "网口速率轮询间隔（秒）",
           "extended_wifi_sensors": "扩展 Wi-Fi 传感器（射频、AP、端口）",
           "topology_port_debug": "在拓扑快照中包含端口映射调试数据",
           "topology_panel_all_users": "向所有用户显示网络拓扑面板"
         },
         "data_description": {
+          "poll_interval": "Home Assistant 读取路由器数据并重新计算网口 RX/TX 速率的间隔，可设置为 5–300 秒。间隔越短，速率越接近实时，但会增加路由器负载。",
           "extended_wifi_sensors": "一次性启用此路由器的全部射频、SSID（AP）和端口传感器，无需逐个启用。关闭后仅会停用由此开关启用的传感器，不会影响你手动停用的传感器。约 30 秒后生效。",
           "topology_port_debug": "在拓扑快照接口中包含原始端口映射跟踪信息（FDB/DHCP/ARP 匹配和分配原因）。HA 诊断数据始终会进行脱敏。",
           "topology_panel_all_users": "允许所有 Home Assistant 用户（而不仅是管理员）访问侧边栏中的网络拓扑面板及其快照 API。拓扑数据包含 DHCP 租约、ARP/交换表、WAN IP 和 DDNS 详情。此面板由所有路由器共用：只要有一台路由器启用本选项，所有用户即可访问。"

@@ -6,7 +6,7 @@ blueprint:
     Nutzt den binary_sensor.XYZ_connectivity aus der OpenWrt Router Integration.
   domain: automation
   author: magicx78
-  source_url: https://github.com/magicx78/ha-openwrt-router/blob/main/blueprints/automation/openwrt_router_outage_notify.yaml
+  source_url: https://github.com/P2Ming/ha-openwrt-router-CN/blob/main/blueprints/automation/openwrt_router_outage_notify.yaml
   homeassistant:
     min_version: 2024.10.0
   input:

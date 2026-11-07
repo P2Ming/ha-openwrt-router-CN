@@ -4,7 +4,12 @@
 
 import React from 'react';
 
-export function SettingsView() {
+interface SettingsViewProps {
+  pollIntervalSeconds?: number;
+}
+
+export function SettingsView({ pollIntervalSeconds }: SettingsViewProps) {
+  const interval = pollIntervalSeconds ?? 60;
   return (
     <div className="topo-view">
       <div className="view-header">
@@ -42,15 +47,15 @@ export function SettingsView() {
         <div className="settings-card__heading">数据维护</div>
         <div className="settings-row">
           <span className="settings-row__label">轮询间隔</span>
-          <span className="settings-row__value">30 s</span>
+          <span className="settings-row__value">{interval} 秒</span>
         </div>
         <div className="settings-row">
           <span className="settings-row__label">API 接口</span>
           <span className="settings-row__value settings-row__value--mono">/api/openwrt_topology/snapshot</span>
         </div>
         <div className="settings-info">
-          HA 后端每 30 秒自动获取一次拓扑数据。
-          设备数据（运行时间、WAN 状态、客户端）由 HA Coordinator 更新。
+          HA 后端按集成选项中的间隔读取路由器数据，网口 RX/TX 速率和本页面会同步刷新。
+          可在“设置 → 设备与服务 → OpenWrt Router → 配置”中修改。
         </div>
       </div>
 
@@ -70,11 +75,11 @@ export function SettingsView() {
           <span className="settings-row__value">
             <a
               className="settings-link settings-link--inline"
-              href="https://github.com/P2Ming/ha-openwrt-router"
+              href="https://github.com/P2Ming/ha-openwrt-router-CN"
               target="_blank"
               rel="noopener noreferrer"
             >
-              magicx78/ha-openwrt-router ↗
+              P2Ming/ha-openwrt-router-CN ↗
             </a>
           </span>
         </div>
