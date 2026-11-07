@@ -46,11 +46,11 @@ export function EdgeTooltip({ edgeId, x, y, edges, data }: Props) {
     if (ap?.uplinkType === 'repeater') {
       badge    = 'WLAN 中继';
       badgeMod = 'repeater';
-      if (ap.backhaulSignal) rows.push({ label: 'Signal', value: `${ap.backhaulSignal} dBm` });
+      if (ap.backhaulSignal) rows.push({ label: '信号', value: `${ap.backhaulSignal} dBm` });
     } else if (ap?.uplinkType === 'mesh') {
       badge    = 'Mesh?';
       badgeMod = 'mesh';
-      if (ap.backhaulSignal) rows.push({ label: 'Signal', value: `${ap.backhaulSignal} dBm` });
+      if (ap.backhaulSignal) rows.push({ label: '信号', value: `${ap.backhaulSignal} dBm` });
     } else {
       badge    = 'LAN 网线';
       badgeMod = 'wired';
@@ -123,7 +123,7 @@ export function EdgeTooltip({ edgeId, x, y, edges, data }: Props) {
     badge  = 'WiFi Mesh';
     badgeMod = 'mesh';
 
-    if (ap?.backhaulSignal) rows.push({ label: 'Signal', value: `${ap.backhaulSignal} dBm` });
+    if (ap?.backhaulSignal) rows.push({ label: '信号', value: `${ap.backhaulSignal} dBm` });
     rows.push({ label: '客户端', value: String(ap?.clientCount ?? 0) });
     if (ap?.ip) rows.push({ label: 'IP', value: ap.ip });
   }

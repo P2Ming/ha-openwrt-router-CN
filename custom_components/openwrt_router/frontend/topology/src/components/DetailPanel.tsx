@@ -289,7 +289,7 @@ function APDetail({ data, clients, actions }: { data: AccessPoint; clients: Clie
         <Row label="类型" value={uplinkTypeLabel(data.uplinkType)} />
         {isWirelessUplink && (
           <>
-            <Row label="Signal"  value={<><SignalBar dbm={data.backhaulSignal} /> {data.backhaulSignal} dBm</>} />
+            <Row label="信号" value={<><SignalBar dbm={data.backhaulSignal} /> {data.backhaulSignal} dBm</>} />
             <Row label="质量" value={q} />
           </>
         )}
@@ -370,7 +370,7 @@ function LldpSection({ lldp }: { lldp: LldpUplink }) {
   return (
     <div className="detail-section">
       <div className="detail-section__heading">
-        Router-Uplink
+        Router Uplink
         <span className="lldp-badge" style={{ marginLeft: 6 }}>LLDP</span>
       </div>
       {lldp.neighborName && <Row label="邻居" value={lldp.neighborName} />}
@@ -512,7 +512,7 @@ function ClientDetail({ data, apName, actions }: { data: Client; apName: string;
       {isWireless && (
         <div className="detail-section">
           <div className="detail-section__heading">信号</div>
-          <Row label="Signal"   value={<><SignalBar dbm={data.signal} /> {data.signal} dBm</>} />
+          <Row label="信号" value={<><SignalBar dbm={data.signal} /> {data.signal} dBm</>} />
           <Row label="质量" value={q} />
         </div>
       )}

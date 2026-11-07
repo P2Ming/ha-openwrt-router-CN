@@ -16,7 +16,7 @@ function sigQ(dbm) {
   return "poor";
 }
 
-const SIG_DE = { good: "gut", fair: "mittel", poor: "schwach" };
+const SIG_DE = { good: "良好", fair: "一般", poor: "较弱" };
 const ICONS = { gw: "🌐", ap: "📶", iface: "📡", wifi: "💻", lan: "🖥️" };
 
 function nodeIcon(node) {
@@ -176,7 +176,7 @@ class OpenWrtTopologyPanel extends HTMLElement {
       }
     } else if (isIface) {
       sub = esc(a.ssid || "");
-      if (a.channel) sub2 = `Kanal ${esc(String(a.channel))}`;
+      if (a.channel) sub2 = `信道 ${esc(String(a.channel))}`;
     } else if (isClient) {
       sub = esc(a.ip || a.mac || "");
       const q = sigQ(a.signal);
@@ -230,26 +230,26 @@ class OpenWrtTopologyPanel extends HTMLElement {
   // ── Details sidebar ─────────────────────────────────────────────
 
   detailsHtml(node) {
-    if (!node) return '<div class="hint">Node auswählen für Details</div>';
+    if (!node) return '<div class="hint">选择节点查看详情</div>';
     const a = node.attributes || {};
     const rows = [
-      ["Name",     node.label || node.id],
-      ["Typ",      node.type],
-      ["Rolle",    node.role],
+      ["名称",     node.label || node.id],
+      ["类型",     node.type],
+      ["角色",     node.role],
       ["ID",       node.id],
       ["IP",       a.host_ip || a.ip],
       ["MAC",      a.mac],
-      ["Status",   node.status],
-      ["Signal",   a.signal != null ? `${a.signal} dBm` : null],
+      ["状态",     node.status],
+      ["信号",     a.signal != null ? `${a.signal} dBm` : null],
       ["SSID",     a.ssid],
-      ["Band",     a.band],
-      ["Kanal",    a.channel],
-      ["WAN",      a.wan_connected != null ? (a.wan_connected ? "verbunden" : "getrennt") : null],
+      ["频段",     a.band],
+      ["信道",     a.channel],
+      ["WAN",      a.wan_connected != null ? (a.wan_connected ? "已连接" : "已断开") : null],
       ["WAN Proto",a.wan_proto],
-      ["Firmware", a.firmware],
-      ["Modell",   a.model],
+      ["固件",     a.firmware],
+      ["型号",     a.model],
       ["Uplink",   a.link_type],
-      ["Abgeleitet", node.inferred ? "ja" : null],
+      ["推测识别", node.inferred ? "是" : null],
     ].filter(([, v]) => v != null && v !== "");
     return rows.map(([k, v]) =>
       `<div class="row"><span class="k">${esc(k)}:</span><span class="v">${esc(String(v))}</span></div>`
@@ -277,7 +277,7 @@ class OpenWrtTopologyPanel extends HTMLElement {
     const layout = this.computeLayout(nodes, edges);
     const H      = layout._canvasH || 500;
     const sel    = nodes.find(n => n.id === this._selected) || null;
-    const stats  = `${meta.router_count || 0} Router · ${meta.client_count || 0} Clients · ${meta.interface_count || 0} Interfaces`;
+    const stats  = `${meta.router_count || 0} 台路由器 · ${meta.client_count || 0} 个客户端 · ${meta.interface_count || 0} 个接口`;
 
     const nodesHtml = nodes.map(n => this.nodeCardHtml(n, layout)).join("");
     const svgEdges  = this.edgesHtml(edges, layout);
@@ -408,18 +408,18 @@ class OpenWrtTopologyPanel extends HTMLElement {
       <div class="page">
         <div class="head">
           <div>
-            <h2>🗺️ OpenWrt Mesh Topology</h2>
+            <h2>🗺️ OpenWrt 网络拓扑</h2>
             <div class="stats">${esc(stats)}</div>
           </div>
-          <button id="reload">Neu laden</button>
+          <button id="reload">重新加载</button>
         </div>
 
         <div class="canvas">
-          ${this._error ? `<div class="err">Fehler: ${esc(this._error)}</div>` : ""}
+          ${this._error ? `<div class="err">错误：${esc(this._error)}</div>` : ""}
           <div class="inner">
-            <div class="clbl c0">Router</div>
-            <div class="clbl c1">Interfaces</div>
-            <div class="clbl c2">Clients</div>
+            <div class="clbl c0">路由器</div>
+            <div class="clbl c1">接口</div>
+            <div class="clbl c2">客户端</div>
             ${grpHtml}
             <svg>${svgEdges}</svg>
             ${nodesHtml}
@@ -427,22 +427,22 @@ class OpenWrtTopologyPanel extends HTMLElement {
         </div>
 
         <div class="side">
-          <h3>Details</h3>
+          <h3>详情</h3>
           ${this.detailsHtml(sel)}
           <div class="legend">
-            <h4>Legende</h4>
+            <h4>图例</h4>
             <div class="li"><div class="ld" style="background:var(--cg)"></div> Gateway</div>
-            <div class="li"><div class="ld" style="background:var(--cr)"></div> AP Router</div>
+            <div class="li"><div class="ld" style="background:var(--cr)"></div> AP 路由器</div>
             <div class="li"><div class="ld" style="background:var(--good)"></div> WLAN 2.4 GHz</div>
             <div class="li"><div class="ld" style="background:var(--cr)"></div> WLAN 5 GHz</div>
             <div class="li"><div class="ld" style="background:#bf5af2"></div> WLAN 6 GHz</div>
-            <div class="li"><div class="ll" style="border-top:2px solid var(--cg);opacity:.7"></div> WAN / intern</div>
+            <div class="li"><div class="ll" style="border-top:2px solid var(--cg);opacity:.7"></div> WAN / 内部</div>
             <div class="li"><div style="width:24px;height:0;border-top:2px dashed var(--cr);opacity:.8"></div> WLAN</div>
             <div class="li"><div class="ll" style="border-top:2px solid var(--cl)"></div> LAN</div>
-            <div class="li"><div style="width:24px;height:0;border-top:2px dashed var(--mut)"></div> Mesh (inferred)</div>
-            <div class="li"><span class="sig sig-good">gut (&gt;−65)</span></div>
-            <div class="li"><span class="sig sig-fair">mittel</span></div>
-            <div class="li"><span class="sig sig-poor">schwach (&lt;−75)</span></div>
+            <div class="li"><div style="width:24px;height:0;border-top:2px dashed var(--mut)"></div> Mesh（推测）</div>
+            <div class="li"><span class="sig sig-good">良好 (&gt;−65)</span></div>
+            <div class="li"><span class="sig sig-fair">一般</span></div>
+            <div class="li"><span class="sig sig-poor">较弱 (&lt;−75)</span></div>
           </div>
         </div>
       </div>

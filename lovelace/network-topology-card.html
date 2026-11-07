@@ -23,11 +23,11 @@
                                  → [Radio 5 GHz]   → [Client ...]
                                  → [LAN]            → [Client ...]
 -->
-<html lang="de">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Netzwerk-Topologie</title>
+  <title>OpenWrt 网络拓扑</title>
   <style>
     :root {
       --color-bg: #1c1c1e;
@@ -278,7 +278,7 @@
 <body>
 <div id="topology-root">
   <div class="topo-error">
-    <div>⏳ Lade Topologie-Daten...</div>
+    <div>⏳ 正在加载拓扑数据...</div>
   </div>
 </div>
 
@@ -299,7 +299,7 @@ async function fetchTopology() {
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
   const state = await res.json();
   const raw = state.attributes?.topology_json;
-  if (!raw) throw new Error("Attribut topology_json nicht gefunden");
+  if (!raw) throw new Error("未找到 topology_json 属性");
   return JSON.parse(raw);
 }
 
@@ -338,7 +338,7 @@ function signalPill(node) {
 function render(topo) {
   const root = document.getElementById("topology-root");
   if (!topo || !topo.nodes) {
-    root.innerHTML = `<div class="topo-error">Keine Topologie-Daten<code>nodes missing</code></div>`;
+    root.innerHTML = `<div class="topo-error">暂无拓扑数据<code>缺少 nodes</code></div>`;
     return;
   }
 
@@ -352,14 +352,14 @@ function render(topo) {
 
   // Updated timestamp
   const updatedAt = meta?.updated
-    ? new Date(meta.updated).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
+    ? new Date(meta.updated).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })
     : "–";
 
   // ── Build HTML ───────────────────────────────────────────────
   let html = `
     <div class="topo-header">
-      <div class="topo-title">🗺️ Netzwerk-Topologie</div>
-      <div class="topo-meta">${meta?.client_count ?? 0} Geräte · ${updatedAt} Uhr</div>
+      <div class="topo-title">🗺️ OpenWrt 网络拓扑</div>
+      <div class="topo-meta">${meta?.client_count ?? 0} 台设备 · 更新于 ${updatedAt}</div>
     </div>
     <div class="topo-canvas" id="topo-canvas">
       <svg class="topo-svg" id="topo-svg"></svg>
@@ -367,21 +367,21 @@ function render(topo) {
 
   // Column 0: Internet symbol
   html += `<div class="topo-column">
-    <div class="topo-column-label">Internet</div>
+    <div class="topo-column-label">互联网</div>
     <div class="node node-gateway" id="node-internet">
       <div class="status-dot status-${meta?.wan_connected ? 'online' : 'offline'}"></div>
       <div class="node-icon">${ICONS.internet}</div>
-      <div class="node-name">Internet</div>
+      <div class="node-name">互联网</div>
       <div class="node-sub">${meta?.wan_ip || "–"}</div>
       <span class="wan-badge wan-${meta?.wan_connected ? 'connected' : 'disconnected'}">
-        ${meta?.wan_connected ? "verbunden" : "getrennt"}
+        ${meta?.wan_connected ? "已连接" : "已断开"}
       </span>
     </div>
   </div>`;
 
   // Column 1: Gateway
   html += `<div class="topo-column">
-    <div class="topo-column-label">Router</div>`;
+    <div class="topo-column-label">路由器</div>`;
   if (gateway) {
     html += `<div class="node node-gateway" id="node-${gateway.id}">
       <div class="status-dot status-online"></div>
@@ -395,14 +395,14 @@ function render(topo) {
 
   // Column 2: Radios
   html += `<div class="topo-column">
-    <div class="topo-column-label">Access Points</div>`;
+    <div class="topo-column-label">AP</div>`;
   for (const radio of radios) {
     html += `<div class="node node-radio" id="node-${radio.id}">
       <div class="status-dot status-${radio.status}"></div>
       <div class="node-icon">${nodeIcon(radio)}</div>
       <div class="node-name">${escHtml(radio.band_label || radio.band)}</div>
       <div class="node-sub">${escHtml(radio.ssid || "–")}</div>
-      ${radio.channel ? `<div class="node-sub">Kanal ${radio.channel}</div>` : ""}
+      ${radio.channel ? `<div class="node-sub">信道 ${radio.channel}</div>` : ""}
     </div>`;
   }
   // LAN pseudo-node
@@ -410,14 +410,14 @@ function render(topo) {
     html += `<div class="node node-client-lan" id="node-lan-group">
       <div class="node-icon">🔌</div>
       <div class="node-name">LAN</div>
-      <div class="node-sub">${lanClients.length} Gerät${lanClients.length > 1 ? "e" : ""}</div>
+      <div class="node-sub">${lanClients.length} 台设备</div>
     </div>`;
   }
   html += `</div>`;
 
   // Column 3: Clients (grouped by parent radio)
   html += `<div class="topo-column">
-    <div class="topo-column-label">Geräte</div>`;
+    <div class="topo-column-label">设备</div>`;
   for (const client of wifiClients) {
     const cssClass = client.connection_type === "lan" ? "node-client-lan" : "node-client-wifi";
     html += `<div class="node ${cssClass}" id="node-${client.id}">
@@ -445,19 +445,19 @@ function render(topo) {
     <div class="topo-legend">
       <div class="legend-item">
         <div class="legend-line legend-internal" style="border-top:2px solid var(--color-gateway);opacity:0.7;height:0;"></div>
-        <span>WAN / intern</span>
+        <span>WAN / 内部</span>
       </div>
       <div class="legend-item">
         <div style="width:28px;height:2px;border-top:2px dashed var(--color-radio);opacity:0.8;"></div>
-        <span>WLAN-Verbindung</span>
+        <span>WLAN 连接</span>
       </div>
       <div class="legend-item">
         <div class="legend-line legend-lan" style="height:0;border-top:2px solid var(--color-lan);"></div>
-        <span>LAN-Verbindung</span>
+        <span>LAN 连接</span>
       </div>
-      <div class="legend-item"><span class="signal-pill signal-good">gut (&gt; −65 dBm)</span></div>
-      <div class="legend-item"><span class="signal-pill signal-fair">mittel</span></div>
-      <div class="legend-item"><span class="signal-pill signal-poor">schwach (&lt; −75 dBm)</span></div>
+      <div class="legend-item"><span class="signal-pill signal-good">良好 (&gt; −65 dBm)</span></div>
+      <div class="legend-item"><span class="signal-pill signal-fair">一般</span></div>
+      <div class="legend-item"><span class="signal-pill signal-poor">较弱 (&lt; −75 dBm)</span></div>
     </div>
   `;
 
@@ -563,11 +563,11 @@ async function main() {
   } catch (err) {
     root.innerHTML = `
       <div class="topo-error">
-        <div>⚠️ Konnte Topologie nicht laden</div>
+        <div>⚠️ 无法加载拓扑</div>
         <code>${escHtml(err.message)}</code>
         <div style="margin-top:8px;color:#636366;font-size:10px;">
           Entity: ${TOPOLOGY_ENTITY}<br>
-          Prüfe: Long-Lived Access Token in window.hassToken gesetzt?
+          请检查：是否已在 window.hassToken 中设置 Long-Lived Access Token？
         </div>
       </div>`;
   }

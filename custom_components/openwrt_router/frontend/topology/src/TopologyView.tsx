@@ -433,7 +433,7 @@ export function TopologyView({ data }: Props) {
     { icon: '◎', label: '聚焦', onClick: () => { selectGateway(); panToNode(data.gateway.id); } },
     { separator: true },
     { icon: '⚠', label: '告警', onClick: () => setActiveTab('alerts') },
-    { icon: '▦', label: 'VLANs ein/aus', onClick: () => setVlanMode(m => !m) },
+    { icon: '▦', label: '切换 VLAN', onClick: () => setVlanMode(m => !m) },
   ], [data.gateway.id, panToNode]);
 
   const buildAPMenuItems = useCallback((ap: AccessPoint): ContextMenuEntry[] => [
