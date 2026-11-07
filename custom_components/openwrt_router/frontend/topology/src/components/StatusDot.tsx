@@ -6,5 +6,5 @@ export function StatusDot({ status }: { status: NodeStatus }) {
 }
 
 export function statusLabel(status: NodeStatus): string {
-  return status === 'online' ? 'Online' : status === 'warning' ? 'Warnung' : 'Offline';
+  return status === 'online' ? '在线' : status === 'warning' ? '警告' : '离线';
 }

@@ -39,7 +39,7 @@ function drawChart(canvas: HTMLCanvasElement, history: CpuHistoryPoint[]): void 
     ctx.fillStyle = COLOR_LABEL;
     ctx.font = '11px system-ui, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Noch keine Daten', W / 2, H / 2);
+    ctx.fillText('暂无数据', W / 2, H / 2);
     return;
   }
 

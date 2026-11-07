@@ -41,10 +41,10 @@ interface Props {
 }
 
 const FILTERS: { key: FilterType; label: string }[] = [
-  { key: 'all',      label: 'Alle' },
+  { key: 'all',      label: '全部' },
   { key: 'aps',      label: 'APs' },
-  { key: 'clients',  label: 'Clients' },
-  { key: 'warnings', label: 'Warnungen' },
+  { key: 'clients',  label: '客户端' },
+  { key: 'warnings', label: '警告' },
 ];
 
 export function StatusBar({
@@ -74,7 +74,7 @@ export function StatusBar({
 }: Props) {
   const allOnline = onlineNodes === totalNodes;
   const healthClass = warningCount === 0 ? 'health-ok' : warningCount <= 2 ? 'health-warn' : 'health-crit';
-  const healthLabel = warningCount === 0 ? 'OK' : `${warningCount} Probleme`;
+  const healthLabel = warningCount === 0 ? '正常' : `${warningCount} 个问题`;
 
   return (
     <div className="status-bar">
@@ -89,10 +89,10 @@ export function StatusBar({
       {/* ── Stats ──────────────────────────────────────────────── */}
       <div className="status-bar__stats">
         <span className="status-bar__stat">
-          Nodes&nbsp;<strong className={allOnline ? '' : 'warn'}>{onlineNodes}/{totalNodes}</strong>
+          节点&nbsp;<strong className={allOnline ? '' : 'warn'}>{onlineNodes}/{totalNodes}</strong>
         </span>
         <span className="status-bar__stat">
-          Clients&nbsp;<strong>{totalClients}</strong>
+          客户端&nbsp;<strong>{totalClients}</strong>
         </span>
         {pingMs != null && pingMs > 0 && (
           <span className="status-bar__stat status-bar__stat--ping">
@@ -128,7 +128,7 @@ export function StatusBar({
             <IconSearch size={13} />
             <input
               type="text"
-              placeholder="Gerät suchen…"
+              placeholder="搜索设备…"
               value={searchQuery}
               onChange={e => onSearchChange(e.target.value)}
             />
@@ -138,7 +138,7 @@ export function StatusBar({
           <button
             className={`status-bar__action${healthMode ? ' active' : ''}`}
             onClick={onToggleHealth}
-            title={healthMode ? 'Health-Modus ausschalten' : 'Health-Modus einschalten'}
+            title={healthMode ? '关闭健康模式' : '开启健康模式'}
           >
             <span style={{ fontSize: 13, lineHeight: 1 }}>♥</span>
           </button>
@@ -147,7 +147,7 @@ export function StatusBar({
           <button
             className={`status-bar__action${heatmapMode ? ' active' : ''}`}
             onClick={onToggleHeatmap}
-            title={heatmapMode ? 'Heatmap ausschalten' : 'WLAN Heatmap einschalten'}
+            title={heatmapMode ? '关闭热力图' : '开启 WLAN 热力图'}
           >
             <IconHeatmap size={15} />
           </button>
@@ -156,7 +156,7 @@ export function StatusBar({
           <button
             className={`status-bar__action${ghostMode ? ' active' : ''}`}
             onClick={onToggleGhost}
-            title={ghostMode ? 'Ghost-Modus ausschalten' : 'Verschwundene Geräte anzeigen'}
+            title={ghostMode ? '关闭幽灵模式' : '显示已消失的设备'}
           >
             <span style={{ fontSize: 13, lineHeight: 1 }}>👻</span>
           </button>
@@ -165,7 +165,7 @@ export function StatusBar({
           <button
             className={`status-bar__action${vlanMode ? ' active' : ''}`}
             onClick={onToggleVlan}
-            title={vlanMode ? 'VLAN-Overlay ausschalten' : 'VLAN-Overlay einschalten'}
+            title={vlanMode ? '关闭 VLAN 图层' : '开启 VLAN 图层'}
           >
             <IconVlan size={15} />
           </button>
@@ -174,7 +174,7 @@ export function StatusBar({
           <button
             className={`status-bar__action${trafficMode ? ' active' : ''}`}
             onClick={onToggleTraffic}
-            title={trafficMode ? 'Traffic-Overlay ausschalten' : 'Traffic-Overlay einschalten'}
+            title={trafficMode ? '关闭流量图层' : '开启流量图层'}
           >
             <IconTraffic size={15} />
           </button>
@@ -184,19 +184,19 @@ export function StatusBar({
             className={`status-bar__select${groupBy !== 'none' ? ' active' : ''}`}
             value={groupBy}
             onChange={e => onGroupByChange(e.target.value as GroupBy)}
-            title="APs gruppieren"
+            title="AP 分组"
           >
-            <option value="none">Gruppe: Aus</option>
-            <option value="type">Nach Typ</option>
-            <option value="vlan">Nach VLAN</option>
-            <option value="status">Nach Status</option>
+            <option value="none">分组：关闭</option>
+            <option value="type">按类型</option>
+            <option value="vlan">按 VLAN</option>
+            <option value="status">按状态</option>
           </select>
 
           {/* ── Fit-view button ──────────────────────────────────── */}
           <button
             className="status-bar__action"
             onClick={onFitView}
-            title="Ansicht anpassen"
+            title="适应视图"
           >
             <IconFitView size={15} />
           </button>

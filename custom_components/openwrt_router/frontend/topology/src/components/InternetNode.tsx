@@ -21,11 +21,11 @@ export function internetState(pingMs: number | null | undefined): InternetState 
 }
 
 const STATE_TITLE: Record<InternetState, string> = {
-  ok:      'Internet erreichbar',
-  fair:    'Internet erreichbar, erhöhte Latenz',
-  slow:    'Internet erreichbar, hohe Latenz',
-  offline: 'Internet nicht erreichbar (kein Ping)',
-  unknown: 'Noch keine Messung',
+  ok:      '互联网连接正常',
+  fair:    '互联网可访问，延迟偏高',
+  slow:    '互联网可访问，延迟很高',
+  offline: '互联网无法访问（无 Ping 响应）',
+  unknown: '尚无测量数据',
 };
 
 function pingClass(ms: number): string {
@@ -49,7 +49,7 @@ export function InternetNode({ pingMs }: Props) {
         <span className={`internet-node__ping ${pingClass(pingMs!)}`}>{pingMs} ms</span>
       )}
       {state === 'offline' && (
-        <span className="internet-node__ping ping-poor">offline</span>
+        <span className="internet-node__ping ping-poor">离线</span>
       )}
     </div>
   );

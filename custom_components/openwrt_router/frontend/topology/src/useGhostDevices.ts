@@ -118,8 +118,8 @@ export function useGhostDevices(
 
 export function formatLastSeen(lastSeenMs: number): string {
   const diffSec = Math.floor((Date.now() - lastSeenMs) / 1000);
-  if (diffSec < 60)  return `vor ${diffSec}s`;
+  if (diffSec < 60)  return `${diffSec} 秒前`;
   const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60)  return `vor ${diffMin}m`;
-  return `vor ${Math.floor(diffMin / 60)}h`;
+  if (diffMin < 60)  return `${diffMin} 分钟前`;
+  return `${Math.floor(diffMin / 60)} 小时前`;
 }

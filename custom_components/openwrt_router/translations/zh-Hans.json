@@ -1,0 +1,255 @@
+{
+  "options": {
+    "step": {
+      "init": {
+        "title": "路由器选项",
+        "data": {
+          "extended_wifi_sensors": "扩展 Wi-Fi 传感器（射频、AP、端口）",
+          "topology_port_debug": "在拓扑快照中包含端口映射调试数据",
+          "topology_panel_all_users": "向所有用户显示网络拓扑面板"
+        },
+        "data_description": {
+          "extended_wifi_sensors": "一次性启用此路由器的全部射频、SSID（AP）和端口传感器，无需逐个启用。关闭后仅会停用由此开关启用的传感器，不会影响你手动停用的传感器。约 30 秒后生效。",
+          "topology_port_debug": "在拓扑快照接口中包含原始端口映射跟踪信息（FDB/DHCP/ARP 匹配和分配原因）。HA 诊断数据始终会进行脱敏。",
+          "topology_panel_all_users": "允许所有 Home Assistant 用户（而不仅是管理员）访问侧边栏中的网络拓扑面板及其快照 API。拓扑数据包含 DHCP 租约、ARP/交换表、WAN IP 和 DDNS 详情。此面板由所有路由器共用：只要有一台路由器启用本选项，所有用户即可访问。"
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "连接 OpenWrt 路由器",
+        "description": "请输入 OpenWrt 路由器的连接信息。路由器必须正在运行 rpcd 和 uhttpd。",
+        "data": {
+          "host": "主机名 / IP 地址",
+          "port": "端口",
+          "protocol": "协议",
+          "username": "用户名",
+          "password": "密码"
+        },
+        "data_description": {
+          "host": "路由器的主机名或 IP 地址（例如 192.168.1.1）",
+          "port": "端口 — HTTPS 使用 443，HTTP 使用 80",
+          "protocol": "连接协议（大多数 OpenWrt 路由器建议使用自签名 HTTPS）",
+          "username": "rpcd 用户名，通常为“root”",
+          "password": "路由器密码"
+        }
+      },
+      "checklist": {
+        "title": "检查路由器配置 — {host}",
+        "description": "**型号：** {model}\n\n**ubus 权限：**\n\n{checklist}\n\n---\n\n{status}\n\n点击**下一步**继续（即使缺少部分权限也可以继续）。",
+        "data": {
+          "deploy_acl": "自动配置权限（通过 ubus 部署 ACL 并重启 rpcd）"
+        },
+        "data_description": {
+          "deploy_acl": "通过 ubus 将 rpcd ACL 文件写入路由器并重启 rpcd。如果路由器阻止 ubus 文件访问，将尝试使用相同凭据通过 SSH 处理。完成后会重新检查权限。"
+        }
+      },
+      "reauth_rpcd_setup": {
+        "title": "{host} 上的 rpcd 无响应",
+        "description": "路由器 **{host}** 阻止了身份验证，rpcd 可能尚未配置。\n\n请通过 SSH 登录路由器并运行：\n\n`opkg update && opkg install rpcd rpcd-mod-rpcsys && uci set rpcd.@rpcd[0].socket='/var/run/ubus/ubus.sock' && uci set rpcd.@rpcd[0].timeout=30 && uci commit rpcd && service rpcd restart`\n\n然后点击**提交**重试。"
+      },
+      "reauth_cannot_connect": {
+        "title": "路由器无法访问：{host}",
+        "description": "无法访问 **{host}**。请确认路由器已开机并可通过网络访问。\n\n点击**提交**重试。"
+      },
+      "reauth_confirm": {
+        "title": "重新验证 OpenWrt 路由器",
+        "description": "**{host}** 的凭据（用户：{username}）已失效。请输入新密码。",
+        "data": {
+          "password": "密码"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "无法连接路由器。请检查主机、端口和协议，并确认路由器可访问。",
+      "invalid_auth": "身份验证失败。请检查用户名和密码。",
+      "invalid_host": "主机地址无效。请输入有效的 IP 地址或主机名。",
+      "timeout": "连接超时。路由器可能无法访问或负载过高。",
+      "unknown": "发生意外错误。请查看 Home Assistant 日志了解详情。",
+      "rpcd_setup_required": "此路由器尚未配置 rpcd。请通过 SSH 登录路由器并运行：opkg update && opkg install rpcd rpcd-mod-rpcsys && uci set rpcd.@rpcd[0].socket='/var/run/ubus/ubus.sock' && uci set rpcd.@rpcd[0].timeout=30 && uci commit rpcd && service rpcd restart",
+      "acl_deploy_failed": "自动部署 ACL 失败：路由器拒绝 ubus 文件写入，并且 SSH 备用方案也未成功。请使用上方所示的 SSH 命令手动部署 ACL，然后重新检查。",
+      "acl_deploy_no_change": "ACL 文件已写入，但重新检查后权限没有变化。rpcd 可能尚未完成重启，或缺少必要软件包。请参考上方安装命令后重试。",
+      "acl_already_current": "路由器上的 ACL 文件已是最新版本，缺少权限由其他原因导致（缺少软件包或 rpcd 尚在重启）。请参考上方安装命令。"
+    },
+    "abort": {
+      "already_configured": "此路由器已配置。",
+      "reauth_successful": "重新验证成功。"
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "connectivity": {
+        "name": "连接状态"
+      },
+      "sticky_clients": {
+        "name": "粘滞 Wi-Fi 客户端"
+      },
+      "wan_connectivity": {
+        "name": "WAN 连接状态"
+      }
+    },
+    "sensor": {
+      "channel_plan": {
+        "name": "信道规划结果"
+      },
+      "dfs_events_24h": {
+        "name": "DFS 事件（24 小时）"
+      },
+      "dhcp_pool": {
+        "name": "DHCP 地址池 {pool}"
+      },
+      "log_status": {
+        "name": "路由器日志",
+        "state": {
+          "pending": "等待中",
+          "ok": "正常",
+          "not_permitted": "无法读取（rpcd ACL 权限不足或未运行 logd）",
+          "error": "错误"
+        }
+      },
+      "router_status": {
+        "name": "路由器状态",
+        "state": {
+          "online": "在线",
+          "offline": "离线",
+          "auth_error": "身份验证错误",
+          "timeout": "超时",
+          "response_error": "响应无效"
+        }
+      },
+      "unstable_clients": {
+        "name": "不稳定的 Wi-Fi 客户端"
+      },
+      "uptime": {
+        "name": "运行时间"
+      },
+      "wan_status": {
+        "name": "WAN 状态"
+      },
+      "client_count": {
+        "name": "已连接客户端"
+      },
+      "cpu_load": {
+        "name": "CPU 负载"
+      },
+      "memory_usage": {
+        "name": "内存使用率"
+      },
+      "memory_total": {
+        "name": "内存总量"
+      },
+      "memory_used": {
+        "name": "已用内存"
+      },
+      "memory_free": {
+        "name": "可用内存"
+      },
+      "wan_ip": {
+        "name": "WAN IP 地址"
+      },
+      "wan_rx": {
+        "name": "WAN 下载"
+      },
+      "wan_tx": {
+        "name": "WAN 上传"
+      },
+      "firmware": {
+        "name": "固件版本"
+      },
+      "update_status": {
+        "name": "更新状态"
+      },
+      "platform_architecture": {
+        "name": "平台架构"
+      },
+      "cpu_load_5min": {
+        "name": "CPU 负载（5 分钟）"
+      },
+      "cpu_load_15min": {
+        "name": "CPU 负载（15 分钟）"
+      },
+      "memory_cached": {
+        "name": "缓存内存"
+      },
+      "memory_shared": {
+        "name": "共享内存"
+      },
+      "memory_buffered": {
+        "name": "缓冲内存"
+      },
+      "disk_total": {
+        "name": "磁盘总容量"
+      },
+      "disk_used": {
+        "name": "已用磁盘空间"
+      },
+      "disk_free": {
+        "name": "可用磁盘空间"
+      },
+      "disk_usage": {
+        "name": "磁盘使用率"
+      },
+      "tmpfs_total": {
+        "name": "临时存储总容量"
+      },
+      "tmpfs_used": {
+        "name": "已用临时存储"
+      },
+      "tmpfs_free": {
+        "name": "可用临时存储"
+      },
+      "tmpfs_usage": {
+        "name": "临时存储使用率"
+      },
+      "active_connections": {
+        "name": "活动网络连接"
+      },
+      "network_topology": {
+        "name": "网络拓扑"
+      }
+    },
+    "switch": {},
+    "button": {
+      "reload_wifi": {
+        "name": "重新加载 Wi-Fi"
+      },
+      "check_updates": {
+        "name": "检查更新"
+      },
+      "perform_updates": {
+        "name": "执行更新"
+      },
+      "reboot": {
+        "name": "重启"
+      }
+    }
+  },
+  "exceptions": {
+    "update_check_failed": {
+      "message": "检查软件包更新失败：{error}"
+    },
+    "update_check_running": {
+      "message": "此路由器正在检查更新，请等待检查结果。"
+    }
+  },
+  "issues": {
+    "channel_plan_conflict": {
+      "title": "OpenWrt 路由器之间存在 Wi-Fi 信道冲突",
+      "description": "在你的 OpenWrt 路由器中发现 {count} 个信道冲突：\n\n{findings}\n\n- `same_channel`：两个射频使用相同的主信道，需要共享空口时间。\n- `overlap`：信道宽度发生重叠，例如信道 44 和 48 均使用 40 MHz，或信道 36 使用覆盖 36–64 的 160 MHz。\n- `non_standard_24`：2.4 GHz 射频未使用信道 1、6 或 11，与相邻信道重叠。\n\n请在无线设置中为相邻 AP 配置不同且互不重叠的信道，或缩短信道宽度。DFS 信道不算冲突；它们会列在每台路由器的“信道规划结果”诊断传感器中。\n\n冲突消失后，此消息会自动关闭。"
+    },
+    "lan_unreachable": {
+      "title": "所有 OpenWrt 路由器均无法访问",
+      "description": "自 {since} 起，Home Assistant 无法访问全部 {count} 台 OpenWrt 路由器（{routers}）。\n\n如果所有路由器同时失联，原因通常位于 Home Assistant 与 LAN 之间（HA 主机网络、交换机、网线或 VLAN），而不是路由器本身。\n\n任一路由器恢复响应后，此消息会自动关闭。"
+    },
+    "ram_high": {
+      "title": "OpenWrt 路由器 {router} 内存使用率过高",
+      "description": "路由器 {router} 自 {since} 起内存持续紧张：{pressure}% 的 RAM 已无法释放，仅剩 {available_mb} MB 可用（内存使用率传感器的 `pressure_pct` 属性）。\n\n当超过 85% 的 RAM 无法释放，或可用内存低于 16 MB 并持续 15 分钟时，会显示此消息。若继续恶化，路由器可能终止进程或重启。常见原因是某个进程持续占用更多内存（例如旧版固件上的 rpcd）。请在路由器上运行 `top` 或 `ps w`，并重启受影响的服务或路由器。\n\n当不可用 RAM 降至 80% 以下且可用内存恢复到至少 16 MB 后，此消息会自动关闭。"
+    },
+    "router_unreachable": {
+      "title": "OpenWrt 路由器 {router} 无法访问",
+      "description": "路由器 {router} 自 {since} 起未响应（错误类型：{error_type}）。\n\n请检查电源、网线，以及路由器上的 rpcd/uhttpd 服务。\n\n路由器恢复响应后，此消息会自动关闭。"
+    }
+  }
+}

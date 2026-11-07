@@ -50,9 +50,9 @@ function groupAPs(aps: AccessPoint[], by: GroupBy): Array<{ label: string; items
   const map = new Map<string, AccessPoint[]>();
   for (const ap of aps) {
     const key =
-      by === 'type'   ? (ap.uplinkType === 'wired' ? 'Kabelgebunden' : 'Mesh')
-    : by === 'vlan'   ? (ap.primaryVlanId != null ? `VLAN ${ap.primaryVlanId}` : 'Kein VLAN')
-    :                   (ap.status === 'online' ? 'Online' : ap.status === 'warning' ? 'Warnung' : 'Offline');
+      by === 'type'   ? (ap.uplinkType === 'wired' ? '有线' : 'Mesh')
+    : by === 'vlan'   ? (ap.primaryVlanId != null ? `VLAN ${ap.primaryVlanId}` : '无 VLAN')
+    :                   (ap.status === 'online' ? '在线' : ap.status === 'warning' ? '警告' : '离线');
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(ap);
   }
@@ -429,19 +429,19 @@ export function TopologyView({ data }: Props) {
 
   // ── Context menu item builders ────────────────────────────────────────────
   const buildGatewayMenuItems = useCallback((): ContextMenuEntry[] => [
-    { icon: '🔍', label: 'Details', onClick: () => selectGateway() },
-    { icon: '◎', label: 'Fokus', onClick: () => { selectGateway(); panToNode(data.gateway.id); } },
+    { icon: '🔍', label: '详情', onClick: () => selectGateway() },
+    { icon: '◎', label: '聚焦', onClick: () => { selectGateway(); panToNode(data.gateway.id); } },
     { separator: true },
-    { icon: '⚠', label: 'Alarme', onClick: () => setActiveTab('alerts') },
+    { icon: '⚠', label: '告警', onClick: () => setActiveTab('alerts') },
     { icon: '▦', label: 'VLANs ein/aus', onClick: () => setVlanMode(m => !m) },
   ], [data.gateway.id, panToNode]);
 
   const buildAPMenuItems = useCallback((ap: AccessPoint): ContextMenuEntry[] => [
-    { icon: '🔍', label: 'Details', onClick: () => selectAP(ap) },
-    { icon: '◎', label: 'Fokus', onClick: () => { selectAP(ap); panToNode(ap.id); } },
+    { icon: '🔍', label: '详情', onClick: () => selectAP(ap) },
+    { icon: '◎', label: '聚焦', onClick: () => { selectAP(ap); panToNode(ap.id); } },
     { separator: true },
-    { icon: '👥', label: 'Clients', onClick: () => setActiveTab('clients') },
-    { icon: '⚠', label: 'Alarme', onClick: () => setActiveTab('alerts') },
+    { icon: '👥', label: '客户端', onClick: () => setActiveTab('clients') },
+    { icon: '⚠', label: '告警', onClick: () => setActiveTab('alerts') },
   ], [panToNode]);
 
   const contextMenuItems = useCallback((): ContextMenuEntry[] => {
@@ -609,10 +609,10 @@ export function TopologyView({ data }: Props) {
                   {data.switchNodes.map(sw => (
                     <div key={sw.id} className="topo-col-switch">
                       <div ref={setNodeRef(sw.id)} style={{ width: 'fit-content' }}>
-                        <div className="switch-node" title={`Inferred switch on port ${sw.gatewayPort ?? '?'} — ${sw.apCount} APs`}>
+                        <div className="switch-node" title={`在端口 ${sw.gatewayPort ?? '?'} 上推测到交换机 — ${sw.apCount} 个 AP`}>
                           <div className="switch-node__icon">⊕</div>
                           <div className="switch-node__label">{sw.label}</div>
-                          <div className="switch-node__hint">? erkannt</div>
+                          <div className="switch-node__hint">推测识别</div>
                         </div>
                       </div>
                     </div>
@@ -674,7 +674,7 @@ export function TopologyView({ data }: Props) {
                         </div>
                       </div>
                       <div className="ghost-ap__lastseen">
-                        Zuletzt gesehen: {formatLastSeen(gAP.lastSeenMs)}
+                        最后出现：{formatLastSeen(gAP.lastSeenMs)}
                       </div>
                     </div>
                   </div>
@@ -698,7 +698,7 @@ export function TopologyView({ data }: Props) {
                     ))}
                     {ghostCols.length > 0 && (
                       <div className="ap-group">
-                        <div className="ap-group__label">Verschwunden</div>
+                        <div className="ap-group__label">已消失</div>
                         <div className="ap-group__row">{ghostCols}</div>
                       </div>
                     )}
@@ -760,7 +760,7 @@ export function TopologyView({ data }: Props) {
           <div className="vlan-overlay">
             <div className="vlan-overlay__title">VLANs ({vlans.length})</div>
             {vlans.length === 0 ? (
-              <div className="vlan-overlay__empty">Keine VLANs erkannt</div>
+              <div className="vlan-overlay__empty">未检测到 VLAN</div>
             ) : (
               <div className="vlan-overlay__list">
                 {vlans.map(v => (
@@ -780,30 +780,30 @@ export function TopologyView({ data }: Props) {
       {/* Heatmap Legend — floating panel when heatmapMode is active */}
       {heatmapMode && activeTab === 'topology' && (
         <div className="heatmap-legend">
-          <div className="heatmap-legend__title">WLAN Signal</div>
+          <div className="heatmap-legend__title">WLAN 信号</div>
           <div className="heatmap-legend__rows">
             <div className="heatmap-legend__row" data-heatmap="excellent">
               <span className="heatmap-legend__swatch" />
-              <span className="heatmap-legend__label">Ausgezeichnet</span>
+              <span className="heatmap-legend__label">极佳</span>
               <span className="heatmap-legend__dbm">≥ −65 dBm</span>
             </div>
             <div className="heatmap-legend__row" data-heatmap="good">
               <span className="heatmap-legend__swatch" />
-              <span className="heatmap-legend__label">Gut</span>
+              <span className="heatmap-legend__label">良好</span>
               <span className="heatmap-legend__dbm">≥ −75 dBm</span>
             </div>
             <div className="heatmap-legend__row" data-heatmap="fair">
               <span className="heatmap-legend__swatch" />
-              <span className="heatmap-legend__label">Schwach</span>
+              <span className="heatmap-legend__label">较弱</span>
               <span className="heatmap-legend__dbm">≥ −80 dBm</span>
             </div>
             <div className="heatmap-legend__row" data-heatmap="poor">
               <span className="heatmap-legend__swatch" />
-              <span className="heatmap-legend__label">Kritisch</span>
+              <span className="heatmap-legend__label">很差</span>
               <span className="heatmap-legend__dbm">&lt; −80 dBm</span>
             </div>
           </div>
-          <div className="heatmap-legend__hint">Ø-Signal der verbundenen Clients</div>
+          <div className="heatmap-legend__hint">已连接客户端的平均信号</div>
         </div>
       )}
 

@@ -7,15 +7,15 @@ interface Props {
 
 function formatTs(ts: number): string {
   const d = new Date(ts * 1000);
-  return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
-    + ' ' + d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+  return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+    + ' ' + d.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
 }
 
 function formatAgo(ts: number): string {
   const secs = Math.floor(Date.now() / 1000) - ts;
-  if (secs < 60) return `vor ${secs}s`;
-  if (secs < 3600) return `vor ${Math.floor(secs / 60)}m`;
-  return `vor ${Math.floor(secs / 3600)}h ${Math.floor((secs % 3600) / 60)}m`;
+  if (secs < 60) return `${secs} 秒前`;
+  if (secs < 3600) return `${Math.floor(secs / 60)} 分钟前`;
+  return `${Math.floor(secs / 3600)} 小时 ${Math.floor((secs % 3600) / 60)} 分钟前`;
 }
 
 interface DiffEntry {
@@ -49,7 +49,7 @@ function diffSnapshots(a: TopologySnapshot, b: TopologySnapshot): DiffEntry[] {
   if (clientDelta !== 0) {
     diffs.push({
       id: '__clients__',
-      label: 'Client-Anzahl',
+      label: '客户端数量',
       change: 'changed',
       detail: `${a.client_count} → ${b.client_count} (${clientDelta > 0 ? '+' : ''}${clientDelta})`,
     });
@@ -59,9 +59,9 @@ function diffSnapshots(a: TopologySnapshot, b: TopologySnapshot): DiffEntry[] {
   if (a.wan_connected !== b.wan_connected) {
     diffs.push({
       id: '__wan__',
-      label: 'WAN-Verbindung',
+      label: 'WAN 连接',
       change: b.wan_connected ? 'added' : 'removed',
-      detail: b.wan_connected ? 'Online' : 'Offline',
+      detail: b.wan_connected ? '在线' : '离线',
     });
   }
 
@@ -99,10 +99,10 @@ export function CompareView({ data }: Props) {
     return (
       <div className="compare-view compare-view--empty">
         <div className="compare-view__empty-icon">📷</div>
-        <div className="compare-view__empty-title">Noch keine Snapshots vorhanden</div>
+        <div className="compare-view__empty-title">暂无快照</div>
         <div className="compare-view__empty-hint">
-          Snapshots werden automatisch alle 5 Minuten gespeichert.<br />
-          Nach dem ersten Snapshot ist der Vergleich verfügbar.
+          系统每 5 分钟自动保存一次快照。<br />
+          生成第一个快照后即可进行对比。
         </div>
       </div>
     );
@@ -111,14 +111,14 @@ export function CompareView({ data }: Props) {
   return (
     <div className="compare-view">
       <div className="compare-view__header">
-        <h2 className="compare-view__title">Vorher / Nachher Vergleich</h2>
-        <p className="compare-view__sub">Wähle zwei Zeitpunkte und sieh was sich geändert hat.</p>
+        <h2 className="compare-view__title">前后对比</h2>
+        <p className="compare-view__sub">选择两个时间点，查看期间发生的变化。</p>
       </div>
 
       {/* Selector Row */}
       <div className="compare-view__selectors">
         <div className="compare-selector">
-          <div className="compare-selector__label">VORHER</div>
+          <div className="compare-selector__label">之前</div>
           <select
             className="compare-selector__select"
             value={idxA}
@@ -132,7 +132,7 @@ export function CompareView({ data }: Props) {
           </select>
           {snapshotA && (
             <div className="compare-selector__meta">
-              {snapshotA.client_count} Clients · WAN {snapshotA.wan_connected ? '✓' : '✗'}
+              {snapshotA.client_count} 个客户端 · WAN {snapshotA.wan_connected ? '✓' : '✗'}
             </div>
           )}
         </div>
@@ -140,13 +140,13 @@ export function CompareView({ data }: Props) {
         <div className="compare-selector__arrow">→</div>
 
         <div className="compare-selector">
-          <div className="compare-selector__label">NACHHER</div>
+          <div className="compare-selector__label">之后</div>
           <select
             className="compare-selector__select"
             value={idxB === 'live' ? 'live' : idxB}
             onChange={e => setIdxB(e.target.value === 'live' ? 'live' : Number(e.target.value))}
           >
-            <option value="live">Jetzt (Live)</option>
+            <option value="live">当前（实时）</option>
             {snapshots.map((s, i) => (
               <option key={s.ts} value={i}>
                 {formatTs(s.ts)} ({formatAgo(s.ts)})
@@ -154,7 +154,7 @@ export function CompareView({ data }: Props) {
             ))}
           </select>
           <div className="compare-selector__meta">
-            {snapshotB.client_count} Clients · WAN {snapshotB.wan_connected ? '✓' : '✗'}
+            {snapshotB.client_count} 个客户端 · WAN {snapshotB.wan_connected ? '✓' : '✗'}
           </div>
         </div>
       </div>
@@ -162,13 +162,13 @@ export function CompareView({ data }: Props) {
       {/* Diff Result */}
       <div className="compare-diff">
         <div className="compare-diff__title">
-          Änderungen ({diffs.length})
+          变化（{diffs.length}）
         </div>
 
         {diffs.length === 0 ? (
           <div className="compare-diff__none">
             <span className="compare-diff__none-icon">✓</span>
-            Keine Änderungen zwischen diesen Zeitpunkten
+            两个时间点之间没有变化
           </div>
         ) : (
           <div className="compare-diff__list">
@@ -187,7 +187,7 @@ export function CompareView({ data }: Props) {
 
       {/* Snapshot Timeline */}
       <div className="compare-timeline">
-        <div className="compare-timeline__title">Gespeicherte Snapshots ({snapshots.length}/20)</div>
+        <div className="compare-timeline__title">已保存快照（{snapshots.length}/20）</div>
         <div className="compare-timeline__list">
           {[...snapshots].reverse().map((s, i) => {
             const origIdx = snapshots.length - 1 - i;
@@ -199,7 +199,7 @@ export function CompareView({ data }: Props) {
                 className={`compare-timeline__item${isA ? ' is-a' : ''}${isB ? ' is-b' : ''}`}
               >
                 <span className="compare-timeline__ts">{formatTs(s.ts)}</span>
-                <span className="compare-timeline__clients">{s.client_count} Clients</span>
+                <span className="compare-timeline__clients">{s.client_count} 个客户端</span>
                 <span className={`compare-timeline__wan${s.wan_connected ? ' up' : ' down'}`}>
                   WAN {s.wan_connected ? '●' : '○'}
                 </span>
@@ -207,12 +207,12 @@ export function CompareView({ data }: Props) {
                   <button
                     className={`compare-timeline__btn${isA ? ' active' : ''}`}
                     onClick={() => setIdxA(origIdx)}
-                    title="Als VORHER wählen"
+                    title="设为之前"
                   >A</button>
                   <button
                     className={`compare-timeline__btn${isB ? ' active' : ''}`}
                     onClick={() => setIdxB(origIdx)}
-                    title="Als NACHHER wählen"
+                    title="设为之后"
                   >B</button>
                 </div>
               </div>

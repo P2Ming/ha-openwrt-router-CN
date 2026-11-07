@@ -51,7 +51,7 @@ function shortPort(name: string | undefined | null): string {
 }
 
 function mediumLabel(m: WiringRow['medium']): string {
-  if (m === 'wired') return 'Kabel';
+  if (m === 'wired') return '网线';
   if (m === 'wifi')  return 'WLAN';
   return 'Mesh?';
 }
@@ -99,12 +99,12 @@ export function WiringView({ data, onSelectAP }: Props) {
           medium === 'wired'
             ? (speed ? `${speed} ${linkUp === false ? '✗' : '✓'}` : (linkUp === false ? 'down' : 'up'))
           : medium === 'wifi'
-            ? (hasRealSignal ? `${ap.backhaulSignal} dBm` : 'verbunden')
-          : (ap.ip ? `vermutet · ${ap.ip}` : 'vermutet');
+            ? (hasRealSignal ? `${ap.backhaulSignal} dBm` : '已连接')
+          : (ap.ip ? `推测 · ${ap.ip}` : '推测');
 
         const targetIsDefault = isDefaultHostname(ap.name);
         const displayName = targetIsDefault
-          ? (ap.ip ? `${ap.ip} (unkonfiguriert)` : 'Unkonfiguriert')
+          ? (ap.ip ? `${ap.ip}（未配置）` : '未配置')
           : ap.name;
 
         // Port-Anzeige:
@@ -126,7 +126,7 @@ export function WiringView({ data, onSelectAP }: Props) {
           speedLabel: speed,
           statusLabel,
           detail: medium === 'mesh'
-            ? `Unverifiziert: nur über Subnet erkannt${ap.ip ? ` (${ap.ip})` : ''}`
+            ? `未验证：仅通过 Subnet 识别${ap.ip ? `（${ap.ip}）` : ''}`
             : medium === 'wifi' && hasRealSignal
               ? `WLAN-Backhaul · ${ap.backhaulSignal} dBm`
               : undefined,
@@ -149,25 +149,25 @@ export function WiringView({ data, onSelectAP }: Props) {
   return (
     <div className="topo-view">
       <div className="view-header">
-        <span className="view-title">Verkabelung</span>
+        <span className="view-title">连接</span>
         <span className="view-count">
-          {wiredCount} Kabel · {wifiCount} WLAN{meshCount > 0 ? ` · ${meshCount} unverifiziert` : ''}
+          {wiredCount} 条网线 · {wifiCount} 个 WLAN{meshCount > 0 ? ` · ${meshCount} 个未验证` : ''}
         </span>
       </div>
 
       {rows.length === 0 ? (
-        <div className="wiring-empty">Keine Verbindungen erkannt.</div>
+        <div className="wiring-empty">未检测到连接。</div>
       ) : (
         <div className="wiring-table" role="table">
           <div className="wiring-row wiring-row--head" role="row">
-            <div role="columnheader">Quelle</div>
+            <div role="columnheader">来源</div>
             <div role="columnheader">Port</div>
             <div role="columnheader" />
-            <div role="columnheader">Ziel</div>
+            <div role="columnheader">目标</div>
             <div role="columnheader">Port</div>
-            <div role="columnheader">Medium</div>
+            <div role="columnheader">介质</div>
             <div role="columnheader">VLANs</div>
-            <div role="columnheader">Status</div>
+            <div role="columnheader">状态</div>
           </div>
 
           {rows.map(r => (

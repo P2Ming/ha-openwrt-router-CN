@@ -218,7 +218,7 @@ function EdgeGroup({ edge, highlighted, dimmed, animIndex, onEdgeHover, vlanMode
         )}
         {mid && oneWay && (
           <text x={mid.x} y={mid.y + 20} className="edge-oneway-hint">
-            <title>Nur von einer Seite gesehen (one-way)</title>
+            <title>仅单侧可见（one-way）</title>
             ◃ einseitig
           </text>
         )}
@@ -226,7 +226,7 @@ function EdgeGroup({ edge, highlighted, dimmed, animIndex, onEdgeHover, vlanMode
           <g className="edge-conflict-marker">
             <circle cx={mid.x + 26} cy={mid.y - 17} r={7} className="edge-conflict-dot" />
             <text x={mid.x + 26} y={mid.y - 13} className="edge-conflict-icon">!</text>
-            <title>LLDP-Port weicht von Bridge-FDB ab</title>
+            <title>LLDP 端口与 Bridge FDB 不一致</title>
           </g>
         )}
         {hitPath}

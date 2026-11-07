@@ -146,7 +146,7 @@ export function GatewayNode({ gateway, selected, dimmed, onSelect, onHover, onCo
             <span>WAN</span><span>{gateway.wanIp || '—'}</span>
           </div>
           <div className="gateway-card__row">
-            <span>Uptime</span><span>{gateway.uptime}</span>
+            <span>运行时间</span><span>{gateway.uptime}</span>
           </div>
         </div>
 
@@ -181,7 +181,7 @@ export function GatewayNode({ gateway, selected, dimmed, onSelect, onHover, onCo
           {clientCount != null && clientCount > 0 && (
             <div className="gateway-metric">
               <div className="gateway-metric__row">
-                <span className="gateway-metric__label">Clients</span>
+                <span className="gateway-metric__label">客户端</span>
                 <span className="gateway-metric__value">{clientCount}</span>
               </div>
             </div>
@@ -213,14 +213,14 @@ export function GatewayNode({ gateway, selected, dimmed, onSelect, onHover, onCo
               style={{ '--vlan-color': vlanColor(v.id) } as React.CSSProperties}
               className={`vlan-badge vlan-badge--colored${v.status === 'up' ? ' vlan-badge--up' : v.status === 'down' ? ' vlan-badge--down' : ''}${gateway.vlansStale ? ' vlan-badge--stale' : ''}`}
               title={gateway.vlansStale
-                ? `VLAN ${v.id} · gecachte Daten (Router kurzzeitig offline)`
+                ? `VLAN ${v.id} · 缓存数据（路由器曾短暂离线）`
                 : `VLAN ${v.id} · ${v.status}`}
             >
               <span className="vlan-badge__id">VLAN {v.id}</span>
             </span>
           ))}
           {gateway.vlansStale && (
-            <span className="vlan-stale-hint" title="VLAN-Daten aus Cache – Router war nicht erreichbar">⚠</span>
+            <span className="vlan-stale-hint" title="VLAN 缓存数据 — 路由器无法访问">⚠</span>
           )}
         </div>
       )}

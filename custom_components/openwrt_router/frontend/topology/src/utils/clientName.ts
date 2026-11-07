@@ -62,6 +62,6 @@ export function clientDisplayName(c: ClientNameInput): string {
   if (!c.mac) return host || '—';
   // A private MAC has no OUI vendor; a manufacturer here comes from HA.
   if (c.manufacturer) return `${c.manufacturer} ${macTail(c.mac)}`;
-  if (c.randomMac ?? isLocallyAdministered(c.mac)) return `Privat-MAC ${macTail(c.mac)}`;
+  if (c.randomMac ?? isLocallyAdministered(c.mac)) return `私有 MAC ${macTail(c.mac)}`;
   return c.mac;
 }

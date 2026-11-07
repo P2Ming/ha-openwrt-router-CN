@@ -51,8 +51,8 @@ export function DevicesView({ data, onSelectGateway, onSelectAP }: Props) {
   return (
     <div className="topo-view">
       <div className="view-header">
-        <span className="view-title">Geräte</span>
-        <span className="view-count">{1 + accessPoints.length} Geräte</span>
+        <span className="view-title">设备</span>
+        <span className="view-count">{1 + accessPoints.length} 台设备</span>
       </div>
 
       <div className="device-list">
@@ -65,7 +65,7 @@ export function DevicesView({ data, onSelectGateway, onSelectAP }: Props) {
           status={gateway.status}
           badge="Gateway"
           badgeMod="gateway"
-          detail={gwClients > 0 ? `${gwClients} direkte Clients` : gateway.uptime ? `Uptime: ${gateway.uptime}` : ''}
+          detail={gwClients > 0 ? `${gwClients} 个直连客户端` : gateway.uptime ? `运行时间：${gateway.uptime}` : ''}
           extra={gateway.pingMs != null ? `Ping: ${gateway.pingMs} ms` : undefined}
           onClick={onSelectGateway}
         />
@@ -92,14 +92,14 @@ export function DevicesView({ data, onSelectGateway, onSelectAP }: Props) {
                 ip={ap.ip}
                 status={ap.status}
                 badge={
-                  ap.uplinkType === 'wired'         ? 'LAN-Kabel'
-                : ap.uplinkType === 'repeater'      ? 'WLAN Repeater'
-                : ap.uplinkType === 'router_uplink' ? 'Router-Uplink'
-                :                                     'WiFi Mesh'
+                  ap.uplinkType === 'wired'         ? 'LAN 网线'
+                : ap.uplinkType === 'repeater'      ? 'WLAN 中继'
+                : ap.uplinkType === 'router_uplink' ? 'Router Uplink'
+                :                                     'Wi-Fi Mesh'
                 }
                 badgeMod={ap.uplinkType}
                 signal={ap.status !== 'offline' ? ap.backhaulSignal : undefined}
-                detail={`${ap.clientCount} Clients`}
+                detail={`${ap.clientCount} 个客户端`}
                 onClick={() => onSelectAP(ap)}
                 clientDistribution={ap.status !== 'offline' ? { avg, loadPct } : undefined}
               />

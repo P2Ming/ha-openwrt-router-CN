@@ -169,10 +169,9 @@ class OpenWrtTopologyPanel extends HTMLElement {
         this._startPolling();
         this._root.render(
           <div style={{ color: 'var(--warning-color, #f59e0b)', padding: '24px', fontFamily: FONT }}>
-            <strong>Nur für Administratoren.</strong>{' '}
-            Die Netzwerk-Topologie ist auf Administratoren beschränkt. Ein Administrator
-            kann sie in den Optionen der OpenWrt-Router-Integration
-            („Topologie-Panel allen Benutzern anzeigen“) für alle Benutzer freigeben.
+            <strong>仅限管理员。</strong>{' '}
+            网络拓扑目前仅允许管理员访问。管理员可在 OpenWrt Router 集成选项中启用
+            “向所有用户显示网络拓扑面板”，向全部用户开放此面板。
           </div>,
         );
         return;
@@ -189,7 +188,7 @@ class OpenWrtTopologyPanel extends HTMLElement {
         return;
       }
 
-      this._renderMessage(`Topology load failed: ${errorText(err)}`, 'var(--error-color, #db4437)');
+      this._renderMessage(`拓扑加载失败：${errorText(err)}`, 'var(--error-color, #db4437)');
     } finally {
       this._fetching = false;
     }
@@ -222,7 +221,7 @@ class OpenWrtTopologyPanel extends HTMLElement {
               whiteSpace: 'nowrap',
             }}
           >
-            Aktualisierung fehlgeschlagen — letzter Stand wird angezeigt ({staleError})
+            更新失败 — 正在显示上次数据（{staleError}）
           </div>
         )}
       </React.StrictMode>,
@@ -232,9 +231,9 @@ class OpenWrtTopologyPanel extends HTMLElement {
   private _renderExpired() {
     this._root?.render(
       <div style={{ color: 'var(--warning-color, #f59e0b)', padding: '24px', fontFamily: FONT }}>
-        <strong>Sitzung abgelaufen.</strong>{' '}
+        <strong>会话已过期。</strong>{' '}
         <a href="#" onClick={e => { e.preventDefault(); window.location.reload(); }} style={{ color: 'var(--primary-color, #03a9f4)' }}>
-          Seite neu laden
+          重新加载页面
         </a>
       </div>,
     );

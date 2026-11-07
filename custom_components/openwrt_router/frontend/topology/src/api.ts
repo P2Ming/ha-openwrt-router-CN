@@ -117,9 +117,9 @@ function formatUptime(seconds: number): string {
   const d = Math.floor(seconds / 86400);
   const h = Math.floor((seconds % 86400) / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  if (d > 0) return `${d}d ${h}h`;
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
+  if (d > 0) return `${d} 天 ${h} 小时`;
+  if (h > 0) return `${h} 小时 ${m} 分钟`;
+  return `${m} 分钟`;
 }
 
 /** Map internal band codes to display strings. */
@@ -137,10 +137,10 @@ export function formatConnectedSince(seconds: number): string {
   const d = Math.floor(seconds / 86400);
   const h = Math.floor((seconds % 86400) / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  if (d > 0) return `${d}d ${h}h`;
-  if (h > 0) return `${h}h ${m}m`;
-  if (m > 0) return `${m}m`;
-  return `< 1m`;
+  if (d > 0) return `${d} 天 ${h} 小时`;
+  if (h > 0) return `${h} 小时 ${m} 分钟`;
+  if (m > 0) return `${m} 分钟`;
+  return '少于 1 分钟';
 }
 
 /** Format a unix timestamp as "HH:MM (noch Xh Ym)" or "Abgelaufen". */
@@ -149,12 +149,12 @@ export function formatLeaseExpiry(unixTs: number): string {
   const expiry = new Date(unixTs * 1000);
   const now = Date.now();
   const diffMs = expiry.getTime() - now;
-  if (diffMs <= 0) return 'Abgelaufen';
+  if (diffMs <= 0) return '已过期';
   const diffH = Math.floor(diffMs / 3_600_000);
   const diffM = Math.floor((diffMs % 3_600_000) / 60_000);
-  const time = expiry.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-  if (diffH > 0) return `${time} (noch ${diffH}h ${diffM}m)`;
-  return `${time} (noch ${diffM}m)`;
+  const time = expiry.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+  if (diffH > 0) return `${time}（剩余 ${diffH} 小时 ${diffM} 分钟）`;
+  return `${time}（剩余 ${diffM} 分钟）`;
 }
 
 // ── OUI manufacturer lookup ───────────────────────────────────────────────

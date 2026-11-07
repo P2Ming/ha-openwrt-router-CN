@@ -55,7 +55,7 @@ export function Minimap({ nodes, canvasW, canvasH, pan, zoom, containerW, contai
 
   return (
     <div className="minimap" onPointerDown={e => e.stopPropagation()}>
-      <div className="minimap__title">Übersicht</div>
+      <div className="minimap__title">概览</div>
       <svg
         className="minimap__svg"
         viewBox={`0 0 ${MINIMAP_W} ${MINIMAP_H}`}

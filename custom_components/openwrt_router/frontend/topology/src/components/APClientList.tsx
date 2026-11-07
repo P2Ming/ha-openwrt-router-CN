@@ -24,7 +24,7 @@ function signalClass(dbm: number): string {
 
 export function APClientList({ clients, onSelectClient }: Props) {
   if (clients.length === 0) {
-    return <div className="ap-client-list ap-client-list--empty">Keine Clients</div>;
+    return <div className="ap-client-list ap-client-list--empty">无客户端</div>;
   }
 
   return (

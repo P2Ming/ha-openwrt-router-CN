@@ -8,57 +8,57 @@ export function SettingsView() {
   return (
     <div className="topo-view">
       <div className="view-header">
-        <span className="view-title">Einstellungen</span>
+        <span className="view-title">设置</span>
       </div>
 
       {/* Integration */}
       <div className="settings-card">
-        <div className="settings-card__heading">Integration</div>
+        <div className="settings-card__heading">集成</div>
         <a
           className="settings-link"
           href="/config/integrations"
-          title="HA Integrationen öffnen"
+          title="打开 HA 集成"
         >
-          Integrationseinstellungen öffnen →
+          打开集成设置 →
         </a>
         <a
           className="settings-link"
           href="/config/entities?domain=sensor&search=openwrt"
-          title="OpenWrt Entities in HA"
+          title="在 HA 中打开 OpenWrt 实体"
         >
-          OpenWrt Entities in HA →
+          OpenWrt 实体管理 →
         </a>
         <a
           className="settings-link"
           href="/config/devices"
-          title="Geräte in HA"
+          title="HA 中的设备"
         >
-          Geräteverwaltung →
+          设备管理 →
         </a>
       </div>
 
       {/* Data */}
       <div className="settings-card">
-        <div className="settings-card__heading">Datenpflege</div>
+        <div className="settings-card__heading">数据维护</div>
         <div className="settings-row">
-          <span className="settings-row__label">Polling-Intervall</span>
+          <span className="settings-row__label">轮询间隔</span>
           <span className="settings-row__value">30 s</span>
         </div>
         <div className="settings-row">
-          <span className="settings-row__label">API-Endpunkt</span>
+          <span className="settings-row__label">API 接口</span>
           <span className="settings-row__value settings-row__value--mono">/api/openwrt_topology/snapshot</span>
         </div>
         <div className="settings-info">
-          Die Topology-Daten werden automatisch alle 30 Sekunden vom HA-Backend abgerufen.
-          Gerätedaten (Uptime, WAN-Status, Clients) werden durch den HA-Coordinator aktualisiert.
+          HA 后端每 30 秒自动获取一次拓扑数据。
+          设备数据（运行时间、WAN 状态、客户端）由 HA Coordinator 更新。
         </div>
       </div>
 
       {/* About */}
       <div className="settings-card">
-        <div className="settings-card__heading">Über</div>
+        <div className="settings-card__heading">关于</div>
         <div className="settings-row">
-          <span className="settings-row__label">Integration</span>
+          <span className="settings-row__label">集成</span>
           <span className="settings-row__value">ha-openwrt-router</span>
         </div>
         <div className="settings-row">
@@ -70,7 +70,7 @@ export function SettingsView() {
           <span className="settings-row__value">
             <a
               className="settings-link settings-link--inline"
-              href="https://github.com/magicx78/ha-openwrt-router"
+              href="https://github.com/P2Ming/ha-openwrt-router"
               target="_blank"
               rel="noopener noreferrer"
             >

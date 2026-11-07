@@ -52,10 +52,10 @@ export function isWanPort(p: PortStat): boolean {
   return p.role === 'wan' || /^wan\d*$/i.test(p.name);
 }
 
-/** Display label for a device: hostname > IP > MAC > "Unbekannt". */
+/** Display label for a device: hostname > IP > MAC > "未知". */
 export function deviceLabel(d: PortDevice | undefined): string {
-  if (!d) return 'Unbekannt';
-  return d.name || d.ip || d.mac || 'Unbekannt';
+  if (!d) return '未知';
+  return d.name || d.ip || d.mac || '未知';
 }
 
 /** Badge text under the port name — undefined = no badge (legacy snapshot). */
@@ -63,16 +63,16 @@ function badgeText(p: PortStat): string | undefined {
   if (p.connectedDevices === undefined) return undefined; // old snapshot
   if (isWanPort(p)) return p.up ? 'Internet' : undefined;
   const count = p.deviceCount ?? p.connectedDevices.length;
-  if (count === 0) return p.up ? 'Unbekannt' : undefined;
+  if (count === 0) return p.up ? '未知' : undefined;
   if (p.hasDownstreamSwitch && p.primaryDevice?.isRouter) return 'Switch/AP';
-  if (count > 1) return `${count} Geräte`;
+  if (count > 1) return `${count} 台设备`;
   return deviceLabel(p.primaryDevice ?? p.connectedDevices[0]);
 }
 
 export const CONFIDENCE_LABEL: Record<string, string> = {
-  high: 'hoch',
-  medium: 'mittel',
-  low: 'niedrig',
+  high: '高',
+  medium: '中',
+  low: '低',
   none: '—',
 };
 
@@ -120,7 +120,7 @@ function PortChip({
 
   const linkDesc = p.up
     ? [p.speed_mbps ? `${p.speed_mbps} Mbps` : 'up', p.duplex ?? ''].filter(Boolean).join(' ')
-    : 'no link';
+    : '无 Link';
 
   const badge = badgeText(p);
   const tooltipDevices = (p.connectedDevices ?? []).slice(0, 6);
@@ -162,7 +162,7 @@ function PortChip({
             </div>
           )}
           {isWanPort(p) && p.connectedDevices !== undefined && (
-            <div className="port-tooltip__meta">Uplink zum Internet</div>
+            <div className="port-tooltip__meta">互联网 Uplink</div>
           )}
           {tooltipDevices.length > 0 ? (
             tooltipDevices.map((d) => (
@@ -170,7 +170,7 @@ function PortChip({
                 <span className={`confidence-dot confidence-dot--${d.confidence}`} />
                 {'→ '}
                 {deviceLabel(d)}
-                {d.confidence === 'medium' && ' (unsicher)'}
+                {d.confidence === 'medium' && '（不确定）'}
               </div>
             ))
           ) : (
@@ -182,10 +182,10 @@ function PortChip({
             )
           )}
           {tooltipOverflow > 0 && (
-            <div className="port-tooltip__meta">… +{tooltipOverflow} weitere</div>
+            <div className="port-tooltip__meta">… 另有 {tooltipOverflow} 台</div>
           )}
           {onSelectPort && p.connectedDevices !== undefined && (
-            <div className="port-tooltip__hint">Klick für Details</div>
+            <div className="port-tooltip__hint">点击查看详情</div>
           )}
         </div>
       )}

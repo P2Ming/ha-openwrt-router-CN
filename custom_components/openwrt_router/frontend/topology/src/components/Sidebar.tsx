@@ -31,20 +31,20 @@ interface Props {
 
 export function Sidebar({ open, activeTab, warningCount, onToggle, onTabChange }: Props) {
   const items: NavItem[] = [
-    { id: 'topology', label: 'Topologie',  Icon: IconTopology },
-    { id: 'devices',  label: 'Geräte',     Icon: IconDevices },
-    { id: 'wiring',   label: 'Verkabelung', Icon: IconWiring },
-    { id: 'clients',  label: 'Clients',    Icon: IconClients },
-    { id: 'traffic',  label: 'Traffic',    Icon: IconTraffic },
-    { id: 'alerts',   label: 'Alarme',     Icon: IconAlerts,  badge: warningCount > 0 ? warningCount : undefined },
-    { id: 'compare',  label: 'Vergleich',  Icon: IconCompare },
-    { id: 'settings', label: 'Einst.',     Icon: IconSettings },
+    { id: 'topology', label: '拓扑',   Icon: IconTopology },
+    { id: 'devices',  label: '设备',   Icon: IconDevices },
+    { id: 'wiring',   label: '连接',   Icon: IconWiring },
+    { id: 'clients',  label: '客户端', Icon: IconClients },
+    { id: 'traffic',  label: '流量',   Icon: IconTraffic },
+    { id: 'alerts',   label: '告警',   Icon: IconAlerts,  badge: warningCount > 0 ? warningCount : undefined },
+    { id: 'compare',  label: '对比',   Icon: IconCompare },
+    { id: 'settings', label: '设置',   Icon: IconSettings },
   ];
 
   return (
     <div className={`topo-sidebar${open ? ' open' : ''}`}>
       {/* Toggle button */}
-      <button className="sidebar-toggle" onClick={onToggle} title={open ? 'Einklappen' : 'Ausklappen'}>
+      <button className="sidebar-toggle" onClick={onToggle} title={open ? '收起' : '展开'}>
         {open ? <IconChevronLeft size={16} /> : <IconChevronRight size={16} />}
       </button>
 

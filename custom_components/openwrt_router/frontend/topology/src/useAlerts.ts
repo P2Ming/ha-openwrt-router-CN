@@ -34,7 +34,7 @@ export function useAlerts(data: TopologyData): Alert[] {
       alerts.push({
         id: 'gw-wan-offline',
         severity: 'critical',
-        message: 'WAN offline — kein Internet',
+        message: 'WAN 离线 — 无法连接互联网',
         nodeId: gw.id,
         nodeName: gw.name,
         nodeType: 'gateway',
@@ -46,7 +46,7 @@ export function useAlerts(data: TopologyData): Alert[] {
       alerts.push({
         id: 'gw-cpu-high',
         severity: 'warning',
-        message: `CPU überlastet: ${gw.cpuLoad.toFixed(0)}%`,
+        message: `CPU 负载过高：${gw.cpuLoad.toFixed(0)}%`,
         nodeId: gw.id,
         nodeName: gw.name,
         nodeType: 'gateway',
@@ -58,7 +58,7 @@ export function useAlerts(data: TopologyData): Alert[] {
       alerts.push({
         id: 'gw-ram-high',
         severity: 'warning',
-        message: `RAM kritisch: ${gw.memUsage.toFixed(0)}%`,
+        message: `RAM 使用率过高：${gw.memUsage.toFixed(0)}%`,
         nodeId: gw.id,
         nodeName: gw.name,
         nodeType: 'gateway',
@@ -70,7 +70,7 @@ export function useAlerts(data: TopologyData): Alert[] {
       alerts.push({
         id: 'gw-ping-null',
         severity: 'warning',
-        message: 'Internet nicht erreichbar (kein Ping)',
+        message: '互联网无法访问（无 Ping 响应）',
         nodeId: gw.id,
         nodeName: gw.name,
         nodeType: 'gateway',
@@ -81,7 +81,7 @@ export function useAlerts(data: TopologyData): Alert[] {
       alerts.push({
         id: 'gw-ping-high',
         severity: 'warning',
-        message: `Hohe Latenz: ${gw.pingMs} ms`,
+        message: `延迟过高：${gw.pingMs} ms`,
         nodeId: gw.id,
         nodeName: gw.name,
         nodeType: 'gateway',
@@ -97,7 +97,7 @@ export function useAlerts(data: TopologyData): Alert[] {
       alerts.push({
         id: 'gw-wan-traffic-high',
         severity: 'warning',
-        message: `Hoher WAN-Traffic: ${(wanBps / 1_000_000).toFixed(0)} Mbit/s`,
+        message: `WAN 流量过高：${(wanBps / 1_000_000).toFixed(0)} Mbit/s`,
         nodeId: gw.id,
         nodeName: gw.name,
         nodeType: 'gateway',
@@ -110,7 +110,7 @@ export function useAlerts(data: TopologyData): Alert[] {
         alerts.push({
           id: `ap-offline-${ap.id}`,
           severity: 'critical',
-          message: 'AP offline',
+          message: 'AP 离线',
           nodeId: ap.id,
           nodeName: ap.name,
           nodeType: 'ap',
@@ -123,7 +123,7 @@ export function useAlerts(data: TopologyData): Alert[] {
         alerts.push({
           id: `ap-overloaded-${ap.id}`,
           severity: 'warning',
-          message: `AP überlastet: ${ap.clientCount} Clients`,
+          message: `AP 负载过高：${ap.clientCount} 个客户端`,
           nodeId: ap.id,
           nodeName: ap.name,
           nodeType: 'ap',
@@ -135,7 +135,7 @@ export function useAlerts(data: TopologyData): Alert[] {
         alerts.push({
           id: `ap-backhaul-poor-${ap.id}`,
           severity: 'warning',
-          message: `Schwaches Backhaul-Signal: ${ap.backhaulSignal} dBm`,
+          message: `Backhaul 信号较弱：${ap.backhaulSignal} dBm`,
           nodeId: ap.id,
           nodeName: ap.name,
           nodeType: 'ap',
@@ -149,7 +149,7 @@ export function useAlerts(data: TopologyData): Alert[] {
         alerts.push({
           id: `client-signal-poor-${client.id}`,
           severity: 'warning',
-          message: `Schwaches Signal: ${client.signal} dBm`,
+          message: `信号较弱：${client.signal} dBm`,
           nodeId: client.id,
           nodeName: client.name,
           nodeType: 'client',
@@ -185,7 +185,7 @@ export function useAlerts(data: TopologyData): Alert[] {
         alerts.push({
           id: `unregistered-router-${client.id}`,
           severity: 'info',
-          message: `Möglicher Router/Repeater: ${client.name || client.hostname}`,
+          message: `可能是路由器/中继器：${client.name || client.hostname}`,
           nodeId: client.id,
           nodeName: client.name || client.hostname,
           nodeType: 'client',

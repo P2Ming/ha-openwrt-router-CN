@@ -60,12 +60,12 @@ export function AlertsView({ data, onSelectGateway, onSelectAP, onSelectClient }
     return (
       <div className="topo-view">
         <div className="view-header">
-          <span className="view-title">Alarme</span>
-          <span className="view-count">0 Probleme</span>
+          <span className="view-title">告警</span>
+          <span className="view-count">0 个问题</span>
         </div>
         <div className="alert-empty">
           <div className="alert-empty__icon">✓</div>
-          <div className="alert-empty__text">Alle Geräte online — keine Alarme</div>
+          <div className="alert-empty__text">所有设备均在线 — 无告警</div>
         </div>
       </div>
     );
@@ -77,13 +77,13 @@ export function AlertsView({ data, onSelectGateway, onSelectAP, onSelectClient }
   return (
     <div className="topo-view">
       <div className="view-header">
-        <span className="view-title">Alarme</span>
-        <span className="view-count alert-count">{total} Problem{total !== 1 ? 'e' : ''}</span>
+        <span className="view-title">告警</span>
+        <span className="view-count alert-count">{total} 个问题</span>
       </div>
 
       {/* ── Anomaly alerts: critical ── */}
       {criticalAlerts.length > 0 && (
-        <AlertSection heading={`${criticalAlerts.length} kritisch`} severity="offline">
+        <AlertSection heading={`${criticalAlerts.length} 个严重问题`} severity="offline">
           {criticalAlerts.map(alert => (
             <AnomalyRow key={alert.id} alert={alert} onClick={() => handleAlertClick(alert)} />
           ))}
@@ -92,7 +92,7 @@ export function AlertsView({ data, onSelectGateway, onSelectAP, onSelectClient }
 
       {/* ── Anomaly alerts: warning ── */}
       {warningAlerts.length > 0 && (
-        <AlertSection heading={`${warningAlerts.length} Warnung${warningAlerts.length !== 1 ? 'en' : ''}`} severity="warning">
+        <AlertSection heading={`${warningAlerts.length} 个警告`} severity="warning">
           {warningAlerts.map(alert => (
             <AnomalyRow key={alert.id} alert={alert} onClick={() => handleAlertClick(alert)} />
           ))}
@@ -114,7 +114,7 @@ export function AlertsView({ data, onSelectGateway, onSelectAP, onSelectClient }
 
       {/* ── Offline APs ── */}
       {offlineNodes.length > 0 && (
-        <AlertSection heading={`${offlineNodes.length} AP offline`} severity="offline">
+        <AlertSection heading={`${offlineNodes.length} 个 AP 离线`} severity="offline">
           {offlineNodes.map(ap => (
             <AlertNodeRow
               key={ap.id}
@@ -130,7 +130,7 @@ export function AlertsView({ data, onSelectGateway, onSelectAP, onSelectClient }
 
       {/* ── Warning APs ── */}
       {warningNodes.length > 0 && (
-        <AlertSection heading={`${warningNodes.length} AP mit Warnung`} severity="warning">
+        <AlertSection heading={`${warningNodes.length} 个 AP 有警告`} severity="warning">
           {warningNodes.map(ap => (
             <AlertNodeRow
               key={ap.id}
@@ -146,7 +146,7 @@ export function AlertsView({ data, onSelectGateway, onSelectAP, onSelectClient }
 
       {/* ── Offline clients ── */}
       {offlineClients.length > 0 && (
-        <AlertSection heading={`${offlineClients.length} Client offline`} severity="offline">
+        <AlertSection heading={`${offlineClients.length} 个客户端离线`} severity="offline">
           {offlineClients.map(c => (
             <AlertClientRow
               key={c.id}
@@ -160,7 +160,7 @@ export function AlertsView({ data, onSelectGateway, onSelectAP, onSelectClient }
 
       {/* ── Warning clients ── */}
       {warningClients.length > 0 && (
-        <AlertSection heading={`${warningClients.length} Client mit Warnung`} severity="warning">
+        <AlertSection heading={`${warningClients.length} 个客户端有警告`} severity="warning">
           {warningClients.map(c => (
             <AlertClientRow
               key={c.id}

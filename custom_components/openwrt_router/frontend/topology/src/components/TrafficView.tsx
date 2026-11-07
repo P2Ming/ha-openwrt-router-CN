@@ -22,25 +22,25 @@ function WanTrafficPanel({ data }: { data: TopologyData }) {
   if (wan?.downstream_bps == null && wan?.upstream_bps == null) {
     return (
       <div className="traffic-section">
-        <div className="traffic-section__title">WAN Traffic</div>
-        <div className="traffic-no-data">Keine Traffic-Daten verfügbar</div>
+        <div className="traffic-section__title">WAN 流量</div>
+        <div className="traffic-no-data">暂无流量数据</div>
       </div>
     );
   }
 
   return (
     <div className="traffic-section">
-      <div className="traffic-section__title">WAN Traffic</div>
+      <div className="traffic-section__title">WAN 流量</div>
       <div className="traffic-rates">
         <div className="traffic-rate traffic-rate--down">
           <span className="traffic-rate__arrow">↓</span>
           <span className="traffic-rate__value">{formatBitRate(currentDown)}</span>
-          <span className="traffic-rate__label">Download</span>
+          <span className="traffic-rate__label">下载</span>
         </div>
         <div className="traffic-rate traffic-rate--up">
           <span className="traffic-rate__arrow">↑</span>
           <span className="traffic-rate__value">{formatBitRate(currentUp)}</span>
-          <span className="traffic-rate__label">Upload</span>
+          <span className="traffic-rate__label">上传</span>
         </div>
       </div>
     </div>
@@ -71,8 +71,8 @@ function TopTalkerPanel({ data, onHighlightClient }: { data: TopologyData; onHig
   if (!ranked.length) {
     return (
       <div className="traffic-section">
-        <div className="traffic-section__title">Top Traffic</div>
-        <div className="traffic-no-data">Keine Client-Traffic-Daten verfügbar</div>
+        <div className="traffic-section__title">流量排行</div>
+        <div className="traffic-no-data">暂无客户端流量数据</div>
       </div>
     );
   }
@@ -81,7 +81,7 @@ function TopTalkerPanel({ data, onHighlightClient }: { data: TopologyData; onHig
 
   return (
     <div className="traffic-section">
-      <div className="traffic-section__title">Top Traffic</div>
+      <div className="traffic-section__title">流量排行</div>
       <div className="talker-list">
         {ranked.map((client) => {
           const total = (client.rxBytes ?? 0) + (client.txBytes ?? 0);
@@ -93,7 +93,7 @@ function TopTalkerPanel({ data, onHighlightClient }: { data: TopologyData; onHig
               key={client.id}
               className="talker-row"
               onClick={() => onHighlightClient(client.id)}
-              title="Im Graph anzeigen"
+              title="在图表中显示"
             >
               <div className="talker-row__icon">
                 <ClientCategoryIcon category={client.category} />
@@ -124,7 +124,7 @@ export function TrafficView({ data, onHighlightClient }: Props) {
   return (
     <div className="topo-view">
       <div className="view-header">
-        <span className="view-title">Traffic</span>
+        <span className="view-title">流量</span>
       </div>
       <WanTrafficPanel data={data} />
       <div className="traffic-divider" />

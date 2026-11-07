@@ -45,7 +45,7 @@ export function NodeTooltip({ nodeId, data, anchorRect }: Props) {
         <div className="node-tooltip__sep" />
         {gw.ip    && <Row label="LAN"    value={gw.ip} />}
         {gw.wanIp && <Row label="WAN"    value={gw.wanIp} />}
-        {gw.uptime && <Row label="Uptime" value={gw.uptime} />}
+        {gw.uptime && <Row label="运行时间" value={gw.uptime} />}
         {gw.cpuLoad != null && (
           <Row label="CPU" value={`${gw.cpuLoad.toFixed(0)}%`} warn={gw.cpuLoad > 80} />
         )}
@@ -55,8 +55,8 @@ export function NodeTooltip({ nodeId, data, anchorRect }: Props) {
         {gw.pingMs != null && gw.pingMs > 0 && (
           <Row label="Ping" value={`${gw.pingMs} ms`} warn={gw.pingMs > 80} />
         )}
-        {gw.firmwareVersion && <Row label="Firmware" value={gw.firmwareVersion} />}
-        <Row label="Clients" value={data.clients.filter(c => c.apId === gw.id).length} />
+        {gw.firmwareVersion && <Row label="固件" value={gw.firmwareVersion} />}
+        <Row label="客户端" value={data.clients.filter(c => c.apId === gw.id).length} />
         {gw.ssids && gw.ssids.length > 0 && (
           <>
             <div className="node-tooltip__sep" />
@@ -101,16 +101,16 @@ export function NodeTooltip({ nodeId, data, anchorRect }: Props) {
           label="Uplink"
           value={
             ap.uplinkType === 'mesh'          ? 'Mesh'
-          : ap.uplinkType === 'repeater'      ? 'WLAN Repeater'
-          : ap.uplinkType === 'router_uplink' ? 'Router-Uplink (LLDP)'
-          :                                     'Kabel'
+          : ap.uplinkType === 'repeater'      ? 'WLAN 中继'
+          : ap.uplinkType === 'router_uplink' ? 'Router Uplink（LLDP）'
+          :                                     '有线'
           }
         />
         {ap.uplinkType === 'router_uplink' && ap.lldpUplink?.neighborName && (
-          <Row label="Nachbar" value={ap.lldpUplink.neighborName} />
+          <Row label="邻居" value={ap.lldpUplink.neighborName} />
         )}
         {ap.uplinkType === 'router_uplink' && (ap.lldpUplink?.duplicates ?? []).map((d, i) => (
-          <Row key={`dup-${i}`} label="Parallele Verbindung" value={parallelLinkLabel(d)} />
+          <Row key={`dup-${i}`} label="并行连接" value={parallelLinkLabel(d)} />
         ))}
         {ap.uplinkStale && <Row label="Uplink" value={STALE_HINT} warn />}
         {(ap.uplinkType === 'mesh' || ap.uplinkType === 'repeater') && (
@@ -122,11 +122,11 @@ export function NodeTooltip({ nodeId, data, anchorRect }: Props) {
         {ap.memUsage != null && (
           <Row label="RAM" value={`${ap.memUsage.toFixed(0)}%`} warn={ap.memUsage > 85} />
         )}
-        {ap.firmwareVersion && <Row label="Firmware" value={ap.firmwareVersion} />}
-        <Row label="Clients" value={ap.clientCount} />
+        {ap.firmwareVersion && <Row label="固件" value={ap.firmwareVersion} />}
+        <Row label="客户端" value={ap.clientCount} />
         {avgSig != null && (
           <Row
-            label="Ø Signal"
+            label="平均信号"
             value={`${avgSig} dBm`}
             warn={avgSig < -72}
           />

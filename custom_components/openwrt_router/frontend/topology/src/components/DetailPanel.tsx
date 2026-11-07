@@ -24,6 +24,13 @@ type SelectedEntity =
   | { type: 'port';    data: PortStat;    routerName: string }
   | null;
 
+const SIGNAL_QUALITY_LABEL = {
+  excellent: '极佳',
+  good: '良好',
+  fair: '一般',
+  poor: '较差',
+} as const;
+
 export interface DetailPanelActions {
   onFocusNode: (nodeId: string) => void;
   onShowClients: () => void;
@@ -46,9 +53,9 @@ export function DetailPanel({ entity, onClose, actions, accessPoints = [] }: Pro
         <span className="detail-panel__title">
           {entity?.type === 'gateway' && 'Gateway'}
           {entity?.type === 'ap'      && 'Access Point'}
-          {entity?.type === 'client'  && 'Client'}
+          {entity?.type === 'client'  && '客户端'}
           {entity?.type === 'port'    && `Port ${shortName(entity.data.name)}`}
-          {!entity && 'Details'}
+          {!entity && '详情'}
         </span>
         <button className="detail-panel__close" onClick={onClose}>
           <IconX size={13} />
@@ -86,23 +93,23 @@ function GatewayDetail({ data, actions, accessPoints }: { data: Gateway; actions
   return (
     <>
       <div className="detail-section">
-        <div className="detail-section__heading">Allgemein</div>
-        <Row label="Name"   value={data.name} />
-        <Row label="Modell" value={data.model} />
-        <Row label="Status" value={<StatusBadge status={data.status} />} />
-        {data.firmwareVersion && <Row label="Firmware" value={data.firmwareVersion} />}
+        <div className="detail-section__heading">常规</div>
+        <Row label="名称" value={data.name} />
+        <Row label="型号" value={data.model} />
+        <Row label="状态" value={<StatusBadge status={data.status} />} />
+        {data.firmwareVersion && <Row label="固件" value={data.firmwareVersion} />}
       </div>
       <div className="detail-section">
-        <div className="detail-section__heading">Netzwerk</div>
+        <div className="detail-section__heading">网络</div>
         <Row label="LAN IP"  value={data.ip} />
         <Row label="WAN IP"  value={data.wanIp} />
-        <Row label="Uptime"  value={data.uptime} />
+        <Row label="运行时间" value={data.uptime} />
         {hasPing && <Row label="Ping (8.8.8.8)" value={`${data.pingMs} ms`} />}
       </div>
 
       {data.wanTraffic && (data.wanTraffic.downstream_bps != null || data.wanTraffic.upstream_bps != null) && (
         <div className="detail-section">
-          <div className="detail-section__heading">WAN Aktivität</div>
+          <div className="detail-section__heading">WAN 活动</div>
           <WanTrafficBars
             down={data.wanTraffic.downstream_bps ?? 0}
             up={data.wanTraffic.upstream_bps ?? 0}
@@ -112,7 +119,7 @@ function GatewayDetail({ data, actions, accessPoints }: { data: Gateway; actions
 
       {hasCpuHistory && (
         <div className="detail-section">
-          <div className="detail-section__heading">CPU Verlauf (1h)</div>
+          <div className="detail-section__heading">CPU 趋势（1 小时）</div>
           <SpeedChart
             history={cpuHistory}
             width={310}
@@ -123,14 +130,14 @@ function GatewayDetail({ data, actions, accessPoints }: { data: Gateway; actions
 
       {(data.cpuLoad != null || data.memUsage != null) && (
         <div className="detail-section">
-          <div className="detail-section__heading">System</div>
+          <div className="detail-section__heading">系统</div>
           <ResourceBars cpu={data.cpuLoad} mem={data.memUsage} />
         </div>
       )}
 
       {(data.ssids ?? []).length > 0 && (
         <div className="detail-section">
-          <div className="detail-section__heading">WLAN-Netze</div>
+          <div className="detail-section__heading">WLAN 网络</div>
           <SsidList ssids={data.ssids!} />
         </div>
       )}
@@ -160,16 +167,16 @@ function GatewayDetail({ data, actions, accessPoints }: { data: Gateway; actions
 
       {(data.events ?? []).length > 0 && (
         <div className="detail-section">
-          <div className="detail-section__heading">Ereignisse</div>
+          <div className="detail-section__heading">事件</div>
           <EventTimeline events={data.events!} />
         </div>
       )}
 
       {actions && (
         <div className="inspector-actions">
-          <ActionBtn icon="◎" label="Fokus"   onClick={() => actions.onFocusNode(data.id)} />
-          <ActionBtn icon="👥" label="Clients" onClick={actions.onShowClients} />
-          <ActionBtn icon="⚠" label="Alarme"  onClick={actions.onShowAlerts} />
+          <ActionBtn icon="◎" label="聚焦" onClick={() => actions.onFocusNode(data.id)} />
+          <ActionBtn icon="👥" label="客户端" onClick={actions.onShowClients} />
+          <ActionBtn icon="⚠" label="告警" onClick={actions.onShowAlerts} />
           <ActionBtn icon="▦" label="VLANs"   onClick={actions.onToggleVlan} />
         </div>
       )}
@@ -186,7 +193,7 @@ function DdnsRow({ svc }: { svc: DdnsService }) {
     : '#fb923c';
 
   const lastUpdateStr = svc.last_update
-    ? new Date(svc.last_update * 1000).toLocaleString('de-DE', {
+    ? new Date(svc.last_update * 1000).toLocaleString('zh-CN', {
         day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
       })
     : null;
@@ -200,7 +207,7 @@ function DdnsRow({ svc }: { svc: DdnsService }) {
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
           <span style={{ width: 7, height: 7, borderRadius: '50%', background: statusColor, display: 'inline-block' }} />
           <span style={{ color: statusColor }}>
-            {svc.status === 'ok' ? 'Aktiv' : svc.status === 'error' ? 'Fehler' : 'Unbekannt'}
+            {svc.status === 'ok' ? '活动' : svc.status === 'error' ? '错误' : '未知'}
           </span>
         </span>
       </div>
@@ -211,7 +218,7 @@ function DdnsRow({ svc }: { svc: DdnsService }) {
       )}
       {lastUpdateStr && (
         <div style={{ fontSize: 11, color: 'var(--text-secondary, #8899aa)' }}>
-          Zuletzt: {lastUpdateStr}
+          最后更新：{lastUpdateStr}
         </div>
       )}
       {svc.service_name && (
@@ -257,33 +264,33 @@ function EventTimeline({ events }: { events: RouterEvent[] }) {
 
 function uplinkTypeLabel(t: UplinkType): string {
   switch (t) {
-    case 'wired':         return 'Kabelgebunden';
-    case 'repeater':      return 'WLAN Repeater';
-    case 'router_uplink': return 'Router-Uplink (LLDP)';
+    case 'wired':         return '有线';
+    case 'repeater':      return 'WLAN 中继';
+    case 'router_uplink': return 'Router Uplink（LLDP）';
     default:              return 'Mesh';
   }
 }
 
 function APDetail({ data, clients, actions }: { data: AccessPoint; clients: Client[]; actions?: DetailPanelActions }) {
-  const q = signalQuality(data.backhaulSignal);
+  const q = SIGNAL_QUALITY_LABEL[signalQuality(data.backhaulSignal)];
   const isWirelessUplink = data.uplinkType === 'mesh' || data.uplinkType === 'repeater';
   return (
     <>
       <div className="detail-section">
-        <div className="detail-section__heading">Allgemein</div>
-        <Row label="Name"    value={data.name} />
-        <Row label="Modell"  value={data.model} />
+        <div className="detail-section__heading">常规</div>
+        <Row label="名称" value={data.name} />
+        <Row label="型号" value={data.model} />
         <Row label="IP"      value={data.ip} />
-        <Row label="Status"  value={<StatusDot status={data.status} />} />
-        {data.firmwareVersion && <Row label="Firmware" value={data.firmwareVersion} />}
+        <Row label="状态" value={<StatusDot status={data.status} />} />
+        {data.firmwareVersion && <Row label="固件" value={data.firmwareVersion} />}
       </div>
       <div className="detail-section">
         <div className="detail-section__heading">Uplink</div>
-        <Row label="Typ"     value={uplinkTypeLabel(data.uplinkType)} />
+        <Row label="类型" value={uplinkTypeLabel(data.uplinkType)} />
         {isWirelessUplink && (
           <>
             <Row label="Signal"  value={<><SignalBar dbm={data.backhaulSignal} /> {data.backhaulSignal} dBm</>} />
-            <Row label="Qualität" value={q} />
+            <Row label="质量" value={q} />
           </>
         )}
         {data.uplinkType === 'router_uplink' && (data.gatewayPort || data.apPort) && (
@@ -300,21 +307,21 @@ function APDetail({ data, clients, actions }: { data: AccessPoint; clients: Clie
       )}
       {(data.ssids ?? []).length > 0 && (
         <div className="detail-section">
-          <div className="detail-section__heading">WLAN-Netze</div>
+          <div className="detail-section__heading">WLAN 网络</div>
           <SsidList ssids={data.ssids!} />
         </div>
       )}
 
       {(data.cpuLoad != null || data.memUsage != null) && (
         <div className="detail-section">
-          <div className="detail-section__heading">System</div>
+          <div className="detail-section__heading">系统</div>
           <ResourceBars cpu={data.cpuLoad} mem={data.memUsage} />
         </div>
       )}
 
       {(data.cpuHistoryBackend?.length ?? 0) >= 2 && (
         <div className="detail-section">
-          <div className="detail-section__heading">CPU Verlauf (1h)</div>
+          <div className="detail-section__heading">CPU 趋势（1 小时）</div>
           <SpeedChart
             history={data.cpuHistoryBackend!}
             width={290}
@@ -324,7 +331,7 @@ function APDetail({ data, clients, actions }: { data: AccessPoint; clients: Clie
       )}
 
       <div className="detail-section">
-        <div className="detail-section__heading">Clients ({clients.length})</div>
+        <div className="detail-section__heading">客户端（{clients.length}）</div>
         <div className="detail-client-list">
           {clients.map(c => (
             <div className="detail-client-item" key={c.id}>
@@ -338,16 +345,16 @@ function APDetail({ data, clients, actions }: { data: AccessPoint; clients: Clie
 
       {(data.events ?? []).length > 0 && (
         <div className="detail-section">
-          <div className="detail-section__heading">Ereignisse</div>
+          <div className="detail-section__heading">事件</div>
           <EventTimeline events={data.events!} />
         </div>
       )}
 
       {actions && (
         <div className="inspector-actions">
-          <ActionBtn icon="◎" label="Fokus"   onClick={() => actions.onFocusNode(data.id)} />
-          <ActionBtn icon="👥" label="Clients" onClick={actions.onShowClients} />
-          <ActionBtn icon="⚠" label="Alarme"  onClick={actions.onShowAlerts} />
+          <ActionBtn icon="◎" label="聚焦" onClick={() => actions.onFocusNode(data.id)} />
+          <ActionBtn icon="👥" label="客户端" onClick={actions.onShowClients} />
+          <ActionBtn icon="⚠" label="告警" onClick={actions.onShowAlerts} />
         </div>
       )}
     </>
@@ -366,7 +373,7 @@ function LldpSection({ lldp }: { lldp: LldpUplink }) {
         Router-Uplink
         <span className="lldp-badge" style={{ marginLeft: 6 }}>LLDP</span>
       </div>
-      {lldp.neighborName && <Row label="Nachbar" value={lldp.neighborName} />}
+      {lldp.neighborName && <Row label="邻居" value={lldp.neighborName} />}
       {lldp.managementIp && (
         <Row
           label="Management-IP"
@@ -377,7 +384,7 @@ function LldpSection({ lldp }: { lldp: LldpUplink }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="port-device-row__link"
-                title="Weboberfläche des Nachbarn öffnen"
+                title="打开邻居设备的 Web 界面"
               >
                 {lldp.managementIp} ↗
               </a>
@@ -389,32 +396,32 @@ function LldpSection({ lldp }: { lldp: LldpUplink }) {
       )}
       {(lldp.fromPort || lldp.toPort) && (
         <Row
-          label="Port (lokal ↔ remote)"
+          label="端口（本地 ↔ 远端）"
           value={`${(lldp.fromPort ?? '?').toUpperCase()} ↔ ${(lldp.toPort ?? '?').toUpperCase()}`}
         />
       )}
-      {lldp.neighborMac && <Row label="Nachbar-MAC" value={<span className="port-device-row__mac">{lldp.neighborMac}</span>} />}
+      {lldp.neighborMac && <Row label="邻居 MAC" value={<span className="port-device-row__mac">{lldp.neighborMac}</span>} />}
       {lldp.neighborChassisId && lldp.neighborChassisId !== lldp.neighborMac && (
         <Row label="Chassis-ID" value={<span className="port-device-row__mac">{lldp.neighborChassisId}</span>} />
       )}
-      {lldp.neighborPortId && <Row label="Remote Port-ID" value={lldp.neighborPortId} />}
+      {lldp.neighborPortId && <Row label="远端 Port ID" value={lldp.neighborPortId} />}
       {(lldp.duplicates ?? []).map((d, i) => (
-        <Row key={`dup-${i}`} label="Parallele Verbindung" value={parallelLinkLabel(d)} />
+        <Row key={`dup-${i}`} label="并行连接" value={parallelLinkLabel(d)} />
       ))}
       {vlans.length > 0 && (
         <Row label="VLANs" value={vlans.length > 1 ? `Trunk ${vlans.join(', ')}` : `${vlans[0]}`} />
       )}
-      <Row label="Verbindung" value={(lldp.linkType ?? 'lldp').toUpperCase()} />
-      {lldp.confidence && <Row label="Vertrauen" value={lldp.confidence} />}
+      <Row label="连接" value={(lldp.linkType ?? 'lldp').toUpperCase()} />
+      {lldp.confidence && <Row label="可信度" value={lldp.confidence} />}
       {lldp.direction && (
-        <Row label="Richtung" value={lldp.direction === 'one_way' ? 'einseitig (nur eine Seite)' : 'beidseitig'} />
+        <Row label="方向" value={lldp.direction === 'one_way' ? '单向（仅一端）' : '双向'} />
       )}
       {lldp.capabilities && lldp.capabilities.length > 0 && (
-        <Row label="Rolle" value={lldp.capabilities.join(', ')} />
+        <Row label="角色" value={lldp.capabilities.join(', ')} />
       )}
       {hasConflict && (
         <div className="lldp-conflict-note">
-          ⚠ LLDP-Port weicht von Bridge-FDB ab
+          ⚠ LLDP 端口与 Bridge FDB 不一致
           {lldp.conflicts!.map((c, i) => (
             <div key={i} className="lldp-conflict-note__detail">
               {c.source}: FDB {c.fdb_port ?? '?'} ≠ LLDP {c.lldp_port ?? '?'}
@@ -439,22 +446,22 @@ function haEntityId(mac: string, hostname: string): string {
 }
 
 const CONNECTION_TYPE_LABEL: Record<ConnectionType, string> = {
-  wired:         'Kabel (LAN)',
+  wired:         '有线（LAN）',
   wireless:      'WLAN',
-  router_uplink: 'Router-Uplink',
-  unknown:       'Unbekannt',
+  router_uplink: 'Router Uplink',
+  unknown:       '未知',
 };
 
 function formatLastSeenIso(iso: string): string {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
-  return d.toLocaleString('de-DE', {
+  return d.toLocaleString('zh-CN', {
     day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
   });
 }
 
 function ClientDetail({ data, apName, actions }: { data: Client; apName: string; actions?: DetailPanelActions }) {
-  const q = signalQuality(data.signal);
+  const q = SIGNAL_QUALITY_LABEL[signalQuality(data.signal)];
   const entityId = haEntityId(data.mac, data.hostname);
   const connectedStr = data.connectedSince ? formatConnectedSince(data.connectedSince) : '';
   const leaseStr = data.dhcpExpires ? formatLeaseExpiry(data.dhcpExpires) : '';
@@ -462,14 +469,14 @@ function ClientDetail({ data, apName, actions }: { data: Client; apName: string;
   const isWireless = data.connectionType === 'wireless' || (data.connectionType == null && data.isWifiClient);
 
   const nameNode = webUrl ? (
-    <a href={webUrl} target="_blank" rel="noopener noreferrer" className="port-device-row__link" title="Weboberfläche öffnen">
+    <a href={webUrl} target="_blank" rel="noopener noreferrer" className="port-device-row__link" title="打开 Web 界面">
       {data.name || data.mac} ↗
     </a>
   ) : (data.name || data.mac);
 
   const ipNode = data.ip
     ? (webUrl
-        ? <a href={webUrl} target="_blank" rel="noopener noreferrer" className="port-device-row__link" title="Weboberfläche öffnen">{data.ip} ↗</a>
+        ? <a href={webUrl} target="_blank" rel="noopener noreferrer" className="port-device-row__link" title="打开 Web 界面">{data.ip} ↗</a>
         : data.ip)
     : '—';
 
@@ -477,50 +484,50 @@ function ClientDetail({ data, apName, actions }: { data: Client; apName: string;
     <>
       {data.stale && <div className="detail-stale-note">⚠ {STALE_HINT}</div>}
       <div className="detail-section">
-        <div className="detail-section__heading">Gerät</div>
-        <Row label="Name"       value={nameNode} />
+        <div className="detail-section__heading">设备</div>
+        <Row label="名称" value={nameNode} />
         <Row label="IP"         value={ipNode} />
-        <Row label="Hostname"   value={data.hostname !== data.mac ? data.hostname : '—'} />
-        <Row label="Hersteller" value={data.manufacturer ?? data.vendor ?? '—'} />
-        {data.haModel && <Row label="Modell" value={data.haModel} />}
-        <Row label="Status"     value={<StatusBadge status={data.status} />} />
+        <Row label="主机名" value={data.hostname !== data.mac ? data.hostname : '—'} />
+        <Row label="厂商" value={data.manufacturer ?? data.vendor ?? '—'} />
+        {data.haModel && <Row label="型号" value={data.haModel} />}
+        <Row label="状态" value={<StatusBadge status={data.status} />} />
       </div>
       <div className="detail-section">
-        <div className="detail-section__heading">Netzwerk</div>
-        <Row label="MAC"    value={data.randomMac ? `${data.mac} (privat)` : data.mac} />
+        <div className="detail-section__heading">网络</div>
+        <Row label="MAC" value={data.randomMac ? `${data.mac}（私有）` : data.mac} />
         {data.connectionType && (
-          <Row label="Verbindungstyp" value={CONNECTION_TYPE_LABEL[data.connectionType]} />
+          <Row label="连接类型" value={CONNECTION_TYPE_LABEL[data.connectionType]} />
         )}
-        <Row label="Band"   value={data.band || '—'} />
+        <Row label="频段" value={data.band || '—'} />
         <Row label="AP"     value={apName} />
         {data.iface     && <Row label="Port/Interface" value={data.iface} />}
         {data.vlanId != null && <Row label="VLAN" value={`VLAN ${data.vlanId}`} />}
         {data.linkSpeed != null && <Row label="Link-Speed" value={data.linkSpeed >= 1000 ? `${data.linkSpeed / 1000} Gbit/s` : `${data.linkSpeed} Mbit/s`} />}
-        {data.source     && <Row label="Quelle" value={data.source} />}
-        {data.confidence && <Row label="Vertrauen" value={<ConfidenceBadge confidence={data.confidence} />} />}
-        {connectedStr && <Row label="Verbunden seit" value={connectedStr} />}
-        {leaseStr     && <Row label="Lease bis"      value={leaseStr} />}
-        {data.lastSeen && <Row label="Zuletzt gesehen" value={formatLastSeenIso(data.lastSeen)} />}
+        {data.source && <Row label="来源" value={data.source} />}
+        {data.confidence && <Row label="可信度" value={<ConfidenceBadge confidence={data.confidence} />} />}
+        {connectedStr && <Row label="已连接" value={connectedStr} />}
+        {leaseStr && <Row label="Lease 到期" value={leaseStr} />}
+        {data.lastSeen && <Row label="最后出现" value={formatLastSeenIso(data.lastSeen)} />}
       </div>
       {isWireless && (
         <div className="detail-section">
-          <div className="detail-section__heading">Signal</div>
+          <div className="detail-section__heading">信号</div>
           <Row label="Signal"   value={<><SignalBar dbm={data.signal} /> {data.signal} dBm</>} />
-          <Row label="Qualität" value={q} />
+          <Row label="质量" value={q} />
         </div>
       )}
 
       {(data.rxBytes != null || data.txBytes != null) && (
         <div className="detail-section">
-          <div className="detail-section__heading">Daten (Session)</div>
+          <div className="detail-section__heading">数据（本次连接）</div>
           <BytesBars rx={data.rxBytes ?? 0} tx={data.txBytes ?? 0} />
         </div>
       )}
 
       {actions && (
         <div className="inspector-actions">
-          <ActionBtn icon="◎" label="AP Fokus" onClick={() => actions.onFocusNode(data.apId)} />
-          <ActionBtn icon="⚠" label="Alarme"   onClick={actions.onShowAlerts} />
+          <ActionBtn icon="◎" label="聚焦 AP" onClick={() => actions.onFocusNode(data.apId)} />
+          <ActionBtn icon="⚠" label="告警" onClick={actions.onShowAlerts} />
         </div>
       )}
 
@@ -530,7 +537,7 @@ function ClientDetail({ data, apName, actions }: { data: Client; apName: string;
         href={`/config/entities/edit/${entityId}`}
         title={`Entity: ${entityId}`}
       >
-        In HA anzeigen →
+        在 HA 中查看 →
       </a>
     </>
   );
@@ -679,7 +686,7 @@ function PortList({ ports, accessPoints }: { ports: PortStat[]; accessPoints: Ac
               </span>
             )}
             {!p.up && (
-              <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>no link</span>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>无 Link</span>
             )}
           </div>
           {(p.vlanIds ?? []).length > 0 && (
@@ -752,52 +759,52 @@ function PortDetail({ data: p, routerName, actions }: { data: PortStat; routerNa
   return (
     <>
       <div className="detail-section">
-        <div className="detail-section__heading">Allgemein</div>
+        <div className="detail-section__heading">常规</div>
         <Row label="Port"   value={`${shortName(p.name)} (${p.name})`} />
         <Row label="Router" value={routerName} />
-        <Row label="Status" value={p.up ? 'Link up' : 'Kein Link'} />
+        <Row label="状态" value={p.up ? 'Link up' : '无 Link'} />
         {p.up && p.speed_mbps != null && (
-          <Row label="Speed" value={`${p.speed_mbps} Mbps${p.duplex ? ` ${p.duplex}` : ''}`} />
+          <Row label="速率" value={`${p.speed_mbps} Mbps${p.duplex ? ` ${p.duplex}` : ''}`} />
         )}
         {(p.vlanIds ?? []).length > 0 && (
           <Row label="VLANs" value={p.vlanIds!.join(', ')} />
         )}
         {!wan && !legacyOnly && (
-          <Row label="Zuordnung" value={<ConfidenceBadge confidence={p.mappingConfidence ?? 'none'} />} />
+          <Row label="映射可信度" value={<ConfidenceBadge confidence={p.mappingConfidence ?? 'none'} />} />
         )}
       </div>
 
       {wan ? (
         <div className="detail-section">
-          <div className="detail-section__heading">Verbindung</div>
+          <div className="detail-section__heading">连接</div>
           <div className="port-detail__note">
-            Uplink zum Internet — auf der WAN-Seite ist keine Client-Zuordnung möglich.
+            互联网 Uplink — WAN 侧无法映射客户端。
           </div>
         </div>
       ) : (
         <div className="detail-section">
           <div className="detail-section__heading">
-            Verbundene Geräte{!legacyOnly && ` (${total})`}
+            已连接设备{!legacyOnly && `（${total}）`}
           </div>
           {legacyOnly && (
             <div className="port-detail__note">
               {p.connectedDevice
                 ? `→ ${p.connectedDevice}`
-                : 'Keine Gerätedaten in diesem Snapshot.'}
+                : '此快照中没有设备数据。'}
             </div>
           )}
           {!legacyOnly && devices.length === 0 && (
             <div className="port-detail__note">
               {p.up
-                ? 'Kein Gerät sicher zugeordnet — FDB leer oder Gerät derzeit still.'
-                : 'Kein Link.'}
+                ? '无法可靠映射设备 — FDB 为空或设备当前无流量。'
+                : '无 Link。'}
             </div>
           )}
           {devices.map((d) => (
             <PortDeviceRow key={d.mac || deviceLabel(d)} device={d} actions={actions} />
           ))}
           {total > devices.length && (
-            <div className="port-detail__note">… +{total - devices.length} weitere (Liste gekürzt)</div>
+            <div className="port-detail__note">… 另有 {total - devices.length} 台（列表已截断）</div>
           )}
         </div>
       )}
@@ -811,7 +818,7 @@ function PortDeviceRow({ device: d, actions }: { device: PortDevice; actions?: D
     <div className="port-device-row">
       <div className="port-device-row__head">
         <span className={`confidence-dot confidence-dot--${d.confidence}`} />
-        <span className="port-device-row__name">{d.name ?? d.ip ?? 'Unbekannt'}</span>
+        <span className="port-device-row__name">{d.name ?? d.ip ?? '未知'}</span>
         {d.isRouter && <span className="port-device-row__tag">AP</span>}
       </div>
       {d.ip && (
@@ -824,7 +831,7 @@ function PortDeviceRow({ device: d, actions }: { device: PortDevice; actions?: D
                 target="_blank"
                 rel="noopener noreferrer"
                 className="port-device-row__link"
-                title="Weboberfläche im Browser öffnen"
+                title="在浏览器中打开 Web 界面"
               >
                 {d.ip} ↗
               </a>
@@ -835,10 +842,10 @@ function PortDeviceRow({ device: d, actions }: { device: PortDevice; actions?: D
         />
       )}
       {d.mac && <Row label="MAC" value={<span className="port-device-row__mac">{d.mac}</span>} />}
-      {d.source && <Row label="Quelle" value={d.source} />}
-      <Row label="Zuordnung" value={<ConfidenceBadge confidence={d.confidence} />} />
+      {d.source && <Row label="来源" value={d.source} />}
+      <Row label="映射可信度" value={<ConfidenceBadge confidence={d.confidence} />} />
       {d.isRouter && d.routerNodeId && actions && (
-        <ActionBtn icon="→" label="Zum Access Point" onClick={() => actions.onFocusNode(d.routerNodeId!)} />
+        <ActionBtn icon="→" label="转到 Access Point" onClick={() => actions.onFocusNode(d.routerNodeId!)} />
       )}
     </div>
   );

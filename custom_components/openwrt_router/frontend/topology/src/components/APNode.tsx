@@ -156,15 +156,15 @@ export function APNode({ ap, clients, selected, dimmed, expanded, onSelect, onHo
 
       <div className="ap-card__footer">
         <span className={`ap-card__badge ${ap.uplinkType}`}>
-          {ap.uplinkType === 'wired'         ? 'Kabel'
-         : ap.uplinkType === 'repeater'      ? 'WLAN Repeater'
-         : ap.uplinkType === 'router_uplink' ? 'Router-Uplink'
+          {ap.uplinkType === 'wired'         ? '有线'
+         : ap.uplinkType === 'repeater'      ? 'WLAN 中继'
+         : ap.uplinkType === 'router_uplink' ? 'Router Uplink'
          :                                     'Mesh?'}
           {ap.uplinkType === 'router_uplink' && <span className="ap-card__lldp-tag">LLDP</span>}
           {ap.uplinkType === 'router_uplink' && parallelLinks.length > 0 && (
             <span
               className="ap-card__lldp-tag ap-card__lldp-tag--parallel"
-              title={parallelLinks.map((d) => `Parallele Verbindung: ${parallelLinkLabel(d)}`).join('\n')}
+              title={parallelLinks.map((d) => `并行连接：${parallelLinkLabel(d)}`).join('\n')}
             >
               {parallelLinks.length + 1}×
             </span>
@@ -175,9 +175,9 @@ export function APNode({ ap, clients, selected, dimmed, expanded, onSelect, onHo
           <button
             className={`ap-card__clients${expanded ? ' expanded' : ''}`}
             onClick={e => { e.stopPropagation(); onToggleExpand?.(); }}
-            title={expanded ? 'Clients einklappen' : 'Clients ausklappen'}
+            title={expanded ? '收起客户端' : '展开客户端'}
           >
-            <strong>{ap.clientCount}</strong> Clients
+            <strong>{ap.clientCount}</strong> 个客户端
             <span className="ap-card__clients-chevron">{expanded ? '▲' : '▼'}</span>
           </button>
         </div>

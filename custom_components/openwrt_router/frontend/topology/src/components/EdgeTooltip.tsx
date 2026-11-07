@@ -44,7 +44,7 @@ export function EdgeTooltip({ edgeId, x, y, edges, data }: Props) {
     title  = ap?.name ?? 'Access Point';
 
     if (ap?.uplinkType === 'repeater') {
-      badge    = 'WLAN Repeater';
+      badge    = 'WLAN 中继';
       badgeMod = 'repeater';
       if (ap.backhaulSignal) rows.push({ label: 'Signal', value: `${ap.backhaulSignal} dBm` });
     } else if (ap?.uplinkType === 'mesh') {
@@ -52,7 +52,7 @@ export function EdgeTooltip({ edgeId, x, y, edges, data }: Props) {
       badgeMod = 'mesh';
       if (ap.backhaulSignal) rows.push({ label: 'Signal', value: `${ap.backhaulSignal} dBm` });
     } else {
-      badge    = 'LAN-Kabel';
+      badge    = 'LAN 网线';
       badgeMod = 'wired';
 
       // Trunk port connection details
@@ -75,18 +75,18 @@ export function EdgeTooltip({ edgeId, x, y, edges, data }: Props) {
         });
       }
     }
-    rows.push({ label: 'Clients', value: String(ap?.clientCount ?? 0) });
+    rows.push({ label: '客户端', value: String(ap?.clientCount ?? 0) });
     if (ap?.ip)     rows.push({ label: 'IP',     value: ap.ip });
-    if (ap?.status) rows.push({ label: 'Status', value: ap.status });
+    if (ap?.status) rows.push({ label: '状态', value: ap.status === 'online' ? '在线' : ap.status === 'warning' ? '警告' : '离线' });
 
   } else if (edge.kind === 'router-uplink') {
     const ap = data.accessPoints.find(a => a.id === edge.targetId);
     const lldp = edge.lldp;
-    title    = lldp?.neighborName || ap?.name || 'Router-Uplink';
+    title    = lldp?.neighborName || ap?.name || 'Router Uplink';
     badge    = 'LLDP';
     badgeMod = 'lldp';
 
-    if (lldp?.neighborName)   rows.push({ label: 'Nachbar', value: lldp.neighborName });
+    if (lldp?.neighborName)   rows.push({ label: '邻居', value: lldp.neighborName });
     if (lldp?.managementIp)   rows.push({ label: 'Management-IP', value: lldp.managementIp });
     const localPort = edge.fromPort ?? lldp?.fromPort;
     const remotePort = edge.toPort ?? lldp?.toPort;
@@ -97,24 +97,24 @@ export function EdgeTooltip({ edgeId, x, y, edges, data }: Props) {
       });
     }
     for (const d of lldp?.duplicates ?? []) {
-      rows.push({ label: 'Parallel', value: parallelLinkLabel(d) });
+      rows.push({ label: '并行连接', value: parallelLinkLabel(d) });
     }
-    if (lldp?.neighborMac)        rows.push({ label: 'Nachbar-MAC', value: lldp.neighborMac });
+    if (lldp?.neighborMac)        rows.push({ label: '邻居 MAC', value: lldp.neighborMac });
     else if (lldp?.neighborChassisId) rows.push({ label: 'Chassis-ID', value: lldp.neighborChassisId });
     const vlans = lldp?.vlanTags ?? edge.vlanTags;
     if (vlans && vlans.length > 0) {
       rows.push({ label: 'VLAN', value: vlans.length > 1 ? `Trunk ${vlans.join(', ')}` : `${vlans[0]}` });
     }
-    rows.push({ label: 'Verbindung', value: (lldp?.linkType ?? 'lldp').toUpperCase() });
-    if (lldp?.confidence) rows.push({ label: 'Vertrauen', value: lldp.confidence });
-    if (lldp?.direction)  rows.push({ label: 'Richtung', value: lldp.direction === 'one_way' ? 'einseitig' : 'beidseitig' });
+    rows.push({ label: '连接', value: (lldp?.linkType ?? 'lldp').toUpperCase() });
+    if (lldp?.confidence) rows.push({ label: '可信度', value: lldp.confidence });
+    if (lldp?.direction)  rows.push({ label: '方向', value: lldp.direction === 'one_way' ? '单向' : '双向' });
     if (lldp?.capabilities && lldp.capabilities.length > 0) {
-      rows.push({ label: 'Rolle', value: lldp.capabilities.join(', ') });
+      rows.push({ label: '角色', value: lldp.capabilities.join(', ') });
     }
     if ((lldp?.conflicts?.length ?? 0) > 0) {
-      rows.push({ label: '⚠ Konflikt', value: 'LLDP-Port weicht von Bridge-FDB ab' });
+      rows.push({ label: '⚠ 冲突', value: 'LLDP 端口与 Bridge FDB 不一致' });
     }
-    if (ap?.clientCount != null) rows.push({ label: 'Clients', value: String(ap.clientCount) });
+    if (ap?.clientCount != null) rows.push({ label: '客户端', value: String(ap.clientCount) });
 
   } else {
     // ap-mesh (parent-AP → child-AP edge)
@@ -124,11 +124,11 @@ export function EdgeTooltip({ edgeId, x, y, edges, data }: Props) {
     badgeMod = 'mesh';
 
     if (ap?.backhaulSignal) rows.push({ label: 'Signal', value: `${ap.backhaulSignal} dBm` });
-    rows.push({ label: 'Clients', value: String(ap?.clientCount ?? 0) });
+    rows.push({ label: '客户端', value: String(ap?.clientCount ?? 0) });
     if (ap?.ip) rows.push({ label: 'IP', value: ap.ip });
   }
 
-  if (edge.stale) rows.unshift({ label: '⚠ Veraltet', value: STALE_HINT });
+  if (edge.stale) rows.unshift({ label: '⚠ 已过期', value: STALE_HINT });
 
   // ── Position: offset so tooltip doesn't sit under the cursor ────────────
   // Nudge left if near right edge (rough estimate: 200px tooltip width)

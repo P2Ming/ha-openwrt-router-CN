@@ -80,7 +80,7 @@ export function ClientsView({ data, onSelectClient }: Props) {
     <div className="topo-view">
       {/* Header + search */}
       <div className="view-header">
-        <span className="view-title">Clients</span>
+        <span className="view-title">客户端</span>
         <span className="view-count">{filtered.length} / {data.clients.length}</span>
       </div>
 
@@ -89,7 +89,7 @@ export function ClientsView({ data, onSelectClient }: Props) {
         <IconSearch size={13} />
         <input
           type="text"
-          placeholder="Name, IP, MAC, Hersteller…"
+          placeholder="名称、IP、MAC、厂商…"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -105,7 +105,7 @@ export function ClientsView({ data, onSelectClient }: Props) {
               className={`filter-btn${bandFilter === b ? ' active' : ''}`}
               onClick={() => setBandFilter(b)}
             >
-              {b === 'all' ? 'Alle Bänder' : `${b} GHz`}
+              {b === 'all' ? '全部频段' : `${b} GHz`}
             </button>
           ))}
         <span className="view-filters__sep" />
@@ -115,14 +115,14 @@ export function ClientsView({ data, onSelectClient }: Props) {
             className={`filter-btn${statusFilter === s ? ' active' : ''}`}
             onClick={() => setStatusFilter(s)}
           >
-            {s === 'all' ? 'Alle Status' : s === 'online' ? 'Online' : 'Offline'}
+            {s === 'all' ? '全部状态' : s === 'online' ? '在线' : '离线'}
           </button>
         ))}
       </div>
 
       {/* Client list */}
       {filtered.length === 0 ? (
-        <div className="view-empty">Keine Clients gefunden</div>
+        <div className="view-empty">未找到客户端</div>
       ) : (
         <div className="client-list">
           {filtered.map(client => (

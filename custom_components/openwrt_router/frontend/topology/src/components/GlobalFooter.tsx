@@ -12,7 +12,7 @@ function formatClock(iso: string | undefined): string | undefined {
   if (!iso) return undefined;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return undefined;
-  return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
 /** Tooltip lines for a top-talker row: where the name comes from and who it is. */
@@ -21,9 +21,9 @@ function talkerTitle(c: Client, total: number): string {
   return [
     c.name,
     c.ip,
-    c.randomMac ? `${c.mac} (Privat-MAC)` : c.mac,
+    c.randomMac ? `${c.mac}（私有 MAC）` : c.mac,
     maker,
-    `${formatBytes(total)} seit Verbindung`,
+    `连接以来 ${formatBytes(total)}`,
   ].filter(Boolean).join('\n');
 }
 
@@ -50,7 +50,7 @@ function DonutChart({ wired, wifi5, wifi24 }: DonutProps) {
   const circ = 2 * Math.PI * r;
 
   const segments = [
-    { value: wired,  color: '#3b82f6', label: 'Wired' },
+    { value: wired,  color: '#3b82f6', label: '有线' },
     { value: wifi5,  color: '#a855f7', label: '5 GHz' },
     { value: wifi24, color: '#22c55e', label: '2.4 GHz' },
   ];
@@ -105,10 +105,10 @@ export function GlobalFooter({ data, onHighlightClient }: Props) {
 
   const hasIssues = critCount > 0 || warnCount > 0;
   const statusText = critCount > 0
-    ? `${critCount} kritisch`
+    ? `${critCount} 个严重问题`
     : warnCount > 0
-      ? `${warnCount} Warnung${warnCount > 1 ? 'en' : ''}`
-      : 'Alles in Ordnung';
+      ? `${warnCount} 个警告`
+      : '一切正常';
   const statusDot = critCount > 0 ? 'critical' : warnCount > 0 ? 'warning' : 'ok';
 
   const wan = data.gateway.wanTraffic;
@@ -116,8 +116,8 @@ export function GlobalFooter({ data, onHighlightClient }: Props) {
   const upBps = wan?.upstream_bps;
   const sampledAt = formatClock(wan?.sampled_at);
   const trafficSub = downBps == null
-    ? 'Noch keine Messung'
-    : [wan?.interval_s ? `Ø ${wan.interval_s} s` : undefined, sampledAt ? `Stand ${sampledAt}` : undefined]
+    ? '尚无测量数据'
+    : [wan?.interval_s ? `平均 ${wan.interval_s} 秒` : undefined, sampledAt ? `采样于 ${sampledAt}` : undefined]
         .filter(Boolean).join(' · ');
 
   const topTalkers = useMemo(() => {
@@ -143,7 +143,7 @@ export function GlobalFooter({ data, onHighlightClient }: Props) {
   }, [data.clients]);
 
   const tsLabel = data.timestamp
-    ? new Date(data.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    ? new Date(data.timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     : '—';
 
   return (
@@ -151,7 +151,7 @@ export function GlobalFooter({ data, onHighlightClient }: Props) {
       <div className="global-footer__grid">
         {/* Sektion 1: Netzwerk Status */}
         <div className="footer-section footer-section--status">
-          <div className="footer-section__title">NETZWERK STATUS</div>
+          <div className="footer-section__title">网络状态</div>
           <div className="footer-status">
             <span className={`footer-status__dot footer-status__dot--${statusDot}`} />
             <span className={`footer-status__text ${hasIssues ? 'footer-status__text--warn' : ''}`}>
@@ -159,10 +159,10 @@ export function GlobalFooter({ data, onHighlightClient }: Props) {
             </span>
           </div>
           <div className="footer-status__sub">
-            Letzte Akt. {tsLabel}
+            最后更新 {tsLabel}
           </div>
           <div className="footer-status__sub">
-            Alle Systeme {hasIssues ? 'mit Meldungen' : 'laufen normal'}
+            所有系统{hasIssues ? '存在告警' : '运行正常'}
           </div>
         </div>
 
@@ -170,9 +170,9 @@ export function GlobalFooter({ data, onHighlightClient }: Props) {
         <div className="footer-section footer-section--traffic">
           <div
             className="footer-section__title"
-            title="WAN-Durchsatz des Gateways, gemittelt zwischen zwei Abfragen des Routers"
+            title="Gateway 的 WAN 吞吐量，取两次路由器轮询之间的平均值"
           >
-            WAN-TRAFFIC
+            WAN 流量
           </div>
           <div className="footer-traffic__values">
             <span className="footer-traffic__down">↓ {formatBitRate(downBps)}</span>
@@ -185,12 +185,12 @@ export function GlobalFooter({ data, onHighlightClient }: Props) {
         <div className="footer-section footer-section--talkers">
           <div
             className="footer-section__title"
-            title="Byte-Zähler des WLAN-Treibers seit der letzten Anmeldung am Access Point"
+            title="自上次连接 AP 以来 WLAN 驱动记录的字节数"
           >
-            TOP TALKER (SEIT VERBINDUNG)
+            流量排行（本次连接）
           </div>
           {topTalkers.length === 0 ? (
-            <div className="footer-talkers__empty">Keine Traffic-Daten</div>
+            <div className="footer-talkers__empty">暂无流量数据</div>
           ) : (
             <ol className="footer-talkers__list">
               {topTalkers.map((c, i) => {
@@ -220,7 +220,7 @@ export function GlobalFooter({ data, onHighlightClient }: Props) {
 
         {/* Sektion 4: Clients nach Typ */}
         <div className="footer-section footer-section--clients-wrap">
-          <div className="footer-section__title">CLIENTS NACH TYP</div>
+          <div className="footer-section__title">按类型统计客户端</div>
           <div className="footer-clients-body">
             <DonutChart
               wired={clientTypes.wired}
